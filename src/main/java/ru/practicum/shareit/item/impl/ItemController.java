@@ -12,7 +12,6 @@ import ru.practicum.shareit.util.CreateValidationGroup;
 import ru.practicum.shareit.util.ItemMapper;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
@@ -48,7 +47,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(@Validated(CreateValidationGroup.class) @RequestBody ItemDto itemDto,
-                          @RequestHeader("X-Sharer-User-Id") @Positive long userId) { //todo настроить исключение
+                          @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         itemDto = itemDto.toBuilder().owner(User.builder().id(userId).build()).build();
         Item item = itemService.create(ItemMapper.toItem(itemDto));
         return ItemMapper.toItemDto(item);

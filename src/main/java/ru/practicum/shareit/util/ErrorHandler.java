@@ -35,6 +35,8 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+
+
     @ExceptionHandler
     private ResponseEntity<Object> handleEmailAlreadyExistException(EmailAlreadyExistException ex) {
         log.info("409 {}", ex.getMessage());
