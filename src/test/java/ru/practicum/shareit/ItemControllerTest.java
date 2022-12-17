@@ -1,7 +1,5 @@
 package ru.practicum.shareit;
 
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,13 +77,13 @@ public class ItemControllerTest {
         Optional<List<ItemDto>> optionalItems = Optional.of(itemController.getAllByUserId(3L));
         assertThat(optionalItems)
                 .isPresent()
-                .hasValueSatisfying(o ->assertThat(o)
+                .hasValueSatisfying(o -> assertThat(o)
                         .hasSize(1));
 
         optionalItems = Optional.of(itemController.getAllByText("machine"));
         assertThat(optionalItems)
                 .isPresent()
-                .hasValueSatisfying(o ->assertThat(o)
+                .hasValueSatisfying(o -> assertThat(o)
                         .isEmpty());
 
         item = item.toBuilder().available(true).build();
@@ -108,7 +106,7 @@ public class ItemControllerTest {
         optionalItems = Optional.of(itemController.getAllByText("Big"));
         assertThat(optionalItems)
                 .isPresent()
-                .hasValueSatisfying(o ->assertThat(o)
+                .hasValueSatisfying(o -> assertThat(o)
                         .isEmpty());
 
         itemController.create(item, 3L);
@@ -116,7 +114,7 @@ public class ItemControllerTest {
         optionalItems = Optional.of(itemController.getAllByText("Big"));
         assertThat(optionalItems)
                 .isPresent()
-                .hasValueSatisfying(o ->assertThat(o)
+                .hasValueSatisfying(o -> assertThat(o)
                         .isEmpty());
     }
 }

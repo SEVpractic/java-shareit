@@ -56,7 +56,7 @@ public class UserControllerTest {
         Optional<List<UserDto>> optionalUsers = Optional.of(userController.getAll());
         assertThat(optionalUsers)
                 .isPresent()
-                .hasValueSatisfying(o ->assertThat(o)
+                .hasValueSatisfying(o -> assertThat(o)
                         .hasSize(4));
 
         optionalUser = Optional.of(userController.getById(4L));
@@ -71,7 +71,7 @@ public class UserControllerTest {
         optionalUsers = Optional.of(userController.getAll());
         assertThat(optionalUsers)
                 .isPresent()
-                .hasValueSatisfying(o ->assertThat(o)
+                .hasValueSatisfying(o -> assertThat(o)
                         .hasSize(3));
 
         userController.create(user);
@@ -79,7 +79,7 @@ public class UserControllerTest {
         optionalUsers = Optional.of(userController.getAll());
         assertThat(optionalUsers)
                 .isPresent()
-                .hasValueSatisfying(o ->assertThat(o)
+                .hasValueSatisfying(o -> assertThat(o)
                         .isEmpty());
     }
 }

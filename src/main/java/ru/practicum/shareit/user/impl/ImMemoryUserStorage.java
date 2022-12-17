@@ -57,7 +57,7 @@ public class ImMemoryUserStorage implements UserStorage {
 
         emailDuplicatesCheck(user);
 
-        if (user.getName() == null ) {
+        if (user.getName() == null) {
             user = user.toBuilder().name(aldUser.getName()).build();
         }
         if (user.getEmail() == null) {
