@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.util.CreateValidationGroup;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -13,15 +14,13 @@ import javax.validation.constraints.Size;
 @Getter
 public class ItemDto {
     private final Long id;
-    @NotBlank
+    @NotBlank (groups = CreateValidationGroup.class)
     @Size(max = 50)
     private final String name;
-    @NotBlank
+    @NotBlank (groups = CreateValidationGroup.class)
     private final String description;
-    @NotNull
+    @NotNull (groups = CreateValidationGroup.class)
     private final Boolean available;
-    @NotNull
     private final User owner;
-    @NotNull
     private final ItemRequest request;
 }
