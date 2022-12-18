@@ -26,47 +26,38 @@ public class ImMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getById(long id) {
-         User user = users.get(id);
-         if (user == null) {
-             log.info("Пользователь c id = {} не существует", id);
-             throw new EntityNotExistException(
-                     String.format("Пользователь c id = %s не существует", id)
-             );
-         }
-        return user;
+    public Optional<User> getById(long id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
     public User create(User user) {
         emailDuplicatesCheck(user);
-        user = updateId(user);
+        updateId(user);
 
         if (users.containsKey(user.getId())) {
-            log.info("Не удалось создать вещь = {}", user.getId());
+            log.info("Не удалось создать ползователя с id = {}", user.getId());
             throw new CreationErrorException(String.format("Не удалось создать ползователя с id = %s", user.getId()));
         }
 
         users.putIfAbsent(user.getId(), user);
+        log.info("Создан пользователь c id = {} ", user.getId());
         return user;
     }
 
     @Override
     public User update(User user) {
-        User aldUser = getById(user.getId());
-
         emailDuplicatesCheck(user);
+        User oldUser = users.get(user.getId());
 
-        if (user.getName() == null) {
-            user = user.toBuilder().name(aldUser.getName()).build();
+        if (user.getName() != null && !user.getName().isBlank()) {
+            oldUser.setName(user.getName());
         }
-        if (user.getEmail() == null) {
-            user = user.toBuilder().email(aldUser.getEmail()).build();
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            oldUser.setEmail(user.getEmail());
         }
 
-        users.put(user.getId(), user);
-
-        return user;
+        return oldUser;
     }
 
     @Override
@@ -84,15 +75,18 @@ public class ImMemoryUserStorage implements UserStorage {
         users.clear();
     }
 
-    private User updateId(User user) {
+    private void updateId(User user) {
         id++;
-        return user.toBuilder()
-                .id(id)
-                .build();
+        user.setId(id);
     }
 
     private void emailDuplicatesCheck(User user) {
         String email = user.getEmail();
+
+        if (users.containsKey(user.getId()) && users.get(user.getId()).getEmail().equals(user.getEmail())) {
+            return;
+        }
+
         users.values().forEach(u -> {
             if (u.getEmail().equals(email)) {
                 log.info("Пользователь c email = {} уже существует", email);

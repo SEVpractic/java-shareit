@@ -6,88 +6,98 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.ItemStorage;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.util.exceptions.CreationErrorException;
 import ru.practicum.shareit.util.exceptions.EntityNotExistException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
 public class InMemoryItemStorage implements ItemStorage {
-    private final Map<Long, Item> items = new HashMap<>();
+    private final Map<Long, List<Item>> userItemIndex = new LinkedHashMap<>(); // ключ - id пользователя
     private long id = 0;
 
     @Override
     public List<Item> getAll() {
-        return new ArrayList<>(items.values());
+        List<Item> items = new ArrayList<>();
+        userItemIndex.values().forEach(items::addAll);
+        return items;
     }
 
     @Override
-    public Item getById(long id) {
-        Item item = items.get(id);
-        if (item == null) {
-            log.info("Вещь c id = {} не существует", id);
-            throw new EntityNotExistException(
-                    String.format("Вещь c id = %s не существует", id)
-            );
-        }
-        return item;
+    public List<Item> getAllByUserId(long userId) {
+        return userItemIndex.get(userId);
+    }
+
+    @Override
+    public List<Item> getAllByText(String text) {
+        List<Item> items = new ArrayList<>();
+        userItemIndex.values().forEach(items::addAll);
+        return items.stream()
+                .filter(i -> i.getAvailable() && textCheck(text, i))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Item> getById(long id) {
+        List<Item> items = new ArrayList<>();
+        userItemIndex.values().forEach(items::addAll);
+        return items.stream()
+                .filter(i -> i.getId() == id)
+                .findFirst();
     }
 
     @Override
     public Item create(Item item) {
-        item = updateId(item);
-
-        if (items.containsKey(item.getId())) {
-            log.info("Не удалось создать вещь = {}", item.getId());
-            throw new CreationErrorException(String.format("Не удалось создать вещь с id = %s", item.getId()));
-        }
-
-        items.putIfAbsent(item.getId(), item);
+        updateId(item);
+        userItemIndex.computeIfAbsent(item.getOwner().getId(), k -> new ArrayList<>()).add(item);
+        log.info("Создана вещь c id = {} ", item.getId());
         return item;
     }
 
     @Override
     public Item update(Item item) {
-        Item aldItem = getById(item.getId());
+        Item oldItem = userItemIndex.get(item.getOwner().getId()).stream()
+                .filter(i -> i.getId() == (long) item.getId())
+                .findFirst()
+                .orElseThrow(() -> new EntityNotExistException(
+                        String.format("Вещь c id = %s не существует", id))
+                );
 
-        if (item.getDescription() != null) {
-            aldItem = aldItem.toBuilder().description(item.getDescription()).build();
+        if (item.getDescription() != null && !item.getDescription().isBlank()) {
+            oldItem.setDescription(item.getDescription());
         }
-        if (item.getName() != null) {
-            aldItem = aldItem.toBuilder().name(item.getName()).build();
+        if (item.getName() != null && !item.getName().isBlank()) {
+            oldItem.setName(item.getName());
         }
         if (item.getAvailable() != null) {
-            aldItem = aldItem.toBuilder().available(item.getAvailable()).build();
+            oldItem.setAvailable(item.getAvailable());
         }
 
-        items.put(item.getId(), aldItem);
-        return aldItem;
+        return oldItem;
     }
 
     @Override
-    public void deleteById(long id) {
-        if (items.remove(id) == null) {
-            log.info("Вещь c id = {} не существует", id);
-            throw new EntityNotExistException(
-                    String.format("Вещь c id = %s не существует", id)
-            );
-        }
+    public void deleteById(long itemId, long userId) {
+        userItemIndex.get(userId).remove(itemId);
     }
 
     @Override
     public void deleteAll() {
-        items.clear();
+        userItemIndex.clear();
     }
 
-    private Item updateId(Item item) {
+    private void updateId(Item item) {
         id++;
-        return item.toBuilder()
-                .id(id)
-                .build();
+        item.setId(id);
+    }
+
+    private boolean textCheck(String text, Item item) {
+        String name = item.getName().trim().toLowerCase();
+        String description = item.getDescription().trim().toLowerCase();
+        text = text.trim().toLowerCase();
+
+        return name.contains(text) || description.contains(text);
     }
 }

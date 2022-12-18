@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.UserStorage;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.util.exceptions.EntityNotExistException;
 
 import java.util.List;
 
@@ -24,16 +25,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getById(long id) {
-        User user = userStorage.getById(id);
         log.info("Возвращен пользователь c id = {} ", id);
-        return user;
+        return userStorage.getById(id)
+                .orElseThrow(() -> new EntityNotExistException(
+                        String.format("Пользователь c id = %s не существует", id))
+                );
     }
 
     @Override
     public User create(User user) {
-        user = userStorage.create(user);
-        log.info("Создан пользователь c id = {} ", user.getId());
-        return user;
+        return userStorage.create(user);
     }
 
     @Override

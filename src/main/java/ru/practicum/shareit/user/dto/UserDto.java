@@ -4,19 +4,23 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Builder;
 import lombok.Getter;
 import ru.practicum.shareit.util.CreateValidationGroup;
+import ru.practicum.shareit.util.UpdateValidationGroup;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Builder(toBuilder = true)
 @Getter
 public class UserDto {
     @JsonSetter("userId")
-    private final Long id;
+    private Long id;
     @NotBlank (groups = CreateValidationGroup.class)
     private final String name;
-    @NotNull (groups = CreateValidationGroup.class)
-    @Email (groups = CreateValidationGroup.class)
+    @NotBlank (groups = CreateValidationGroup.class)
+    @Email (groups = {CreateValidationGroup.class, UpdateValidationGroup.class})
     private final String email;
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

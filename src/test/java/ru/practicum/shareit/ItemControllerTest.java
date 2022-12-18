@@ -102,14 +102,6 @@ public class ItemControllerTest {
                 .hasValueSatisfying(o -> assertThat(o)
                         .hasSize(1));
 
-        itemController.deleteById(1L);
-        optionalItems = Optional.of(itemController.getAllByText("Big"));
-        assertThat(optionalItems)
-                .isPresent()
-                .hasValueSatisfying(o -> assertThat(o)
-                        .isEmpty());
-
-        itemController.create(item, 3L);
         itemController.deleteAll();
         optionalItems = Optional.of(itemController.getAllByText("Big"));
         assertThat(optionalItems)

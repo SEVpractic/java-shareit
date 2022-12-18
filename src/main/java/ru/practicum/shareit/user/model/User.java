@@ -2,11 +2,13 @@ package ru.practicum.shareit.user.model;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Builder(toBuilder = true)
+@Setter
 @Getter
 public class User {
-    private final Long id;
-    private final String name;
-    private final String email;
+    private Long id;
+    private String name;
+    private String email;
 }

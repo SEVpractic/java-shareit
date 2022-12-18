@@ -1,12 +1,23 @@
 package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.util.Crud;
 
 import java.util.List;
 
-public interface ItemService extends Crud<Item> {
+public interface ItemService {
+    List<Item> getAll();
+
     List<Item> getAllByUserId(long userId);
 
     List<Item> getAllByText(String text);
+
+    Item getById(long id);
+
+    Item create(Item item);
+
+    Item update(Item item);
+
+    void deleteById(long itemId, long userId);
+
+    void deleteAll();
 }

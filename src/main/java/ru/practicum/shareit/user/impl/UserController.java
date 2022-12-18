@@ -4,12 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.CreateValidationGroup;
+import ru.practicum.shareit.util.UpdateValidationGroup;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Validated
 public class UserController {
     private final UserService userService;
 
@@ -24,28 +26,28 @@ public class UserController {
     public List<UserDto> getAll() {
         List<User> users = userService.getAll();
         return users.stream()
-                .map(UserMapper::toItemDto)
+                .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/{userId}")
     public UserDto getById(@PathVariable("userId") @Positive long id) {
         User user = userService.getById(id);
-        return UserMapper.toItemDto(user);
+        return UserMapper.toUserDto(user);
     }
 
     @PostMapping
     public UserDto create(@Validated(CreateValidationGroup.class) @RequestBody UserDto userDto) {
-        User user = userService.create(UserMapper.toItem(userDto));
-        return UserMapper.toItemDto(user);
+        User user = userService.create(UserMapper.toUser(userDto));
+        return UserMapper.toUserDto(user);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@Valid @RequestBody UserDto userDto,
+    public UserDto update(@Validated(UpdateValidationGroup.class) @RequestBody UserDto userDto,
                           @PathVariable("userId") @Positive Long id) {
-        userDto = userDto.toBuilder().id(id).build();
-        User user = userService.update(UserMapper.toItem(userDto));
-        return UserMapper.toItemDto(user);
+        userDto.setId(id);
+        User user = userService.update(UserMapper.toUser(userDto));
+        return UserMapper.toUserDto(user);
     }
 
     @DeleteMapping("/{userId}")

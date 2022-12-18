@@ -4,15 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.util.CreateValidationGroup;
-import ru.practicum.shareit.util.ItemMapper;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,8 +19,10 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Validated
 public class ItemController {
     private final ItemService itemService;
+    private final UserService userService;
 
     @GetMapping("/{itemId}")
     public ItemDto getById(@PathVariable("itemId") @Positive long id) {
@@ -38,7 +39,9 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getAllByText(@RequestParam(name = "text") @NotNull String text) {
+    public List<ItemDto> getAllByText(@RequestParam(name = "text") String text) {
+        if (text.isBlank()) return List.of();
+
         return itemService.getAllByText(text)
                 .stream()
                 .map(ItemMapper::toItemDto)
@@ -48,8 +51,9 @@ public class ItemController {
     @PostMapping
     public ItemDto create(@Validated(CreateValidationGroup.class) @RequestBody ItemDto itemDto,
                           @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
-        itemDto = itemDto.toBuilder().owner(User.builder().id(userId).build()).build();
-        Item item = itemService.create(ItemMapper.toItem(itemDto));
+        Item item = ItemMapper.toItem(itemDto);
+        item.setOwner(userService.getById(userId));
+        item = itemService.create(item);
         return ItemMapper.toItemDto(item);
     }
 
@@ -57,14 +61,17 @@ public class ItemController {
     public ItemDto update(@PathVariable("itemId") @Positive long id,
                           @RequestHeader("X-Sharer-User-Id") @Positive long userId,
                           @Valid @RequestBody ItemDto itemDto) {
-        itemDto = itemDto.toBuilder().id(id).owner(User.builder().id(userId).build()).build();
-        Item item = itemService.update(ItemMapper.toItem(itemDto));
+        itemDto.setId(id);
+        Item item = ItemMapper.toItem(itemDto);
+        item.setOwner(userService.getById(userId));
+        item = itemService.update(item);
         return ItemMapper.toItemDto(item);
     }
 
     @DeleteMapping("/{itemId}")
-    public void deleteById(@PathVariable("itemId") @Positive long id) {
-        itemService.deleteById(id);
+    public void deleteById(@PathVariable("itemId") @Positive long itemId,
+                           @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
+        itemService.deleteById(itemId, userId);
     }
 
     @DeleteMapping
