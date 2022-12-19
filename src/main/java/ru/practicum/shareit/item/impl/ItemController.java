@@ -60,7 +60,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto update(@PathVariable("itemId") @Positive long id,
                           @RequestHeader("X-Sharer-User-Id") @Positive long userId,
-                          @Valid @RequestBody ItemDto itemDto) {
+                          @RequestBody ItemDto itemDto) {
         itemDto.setId(id);
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(userService.getById(userId));

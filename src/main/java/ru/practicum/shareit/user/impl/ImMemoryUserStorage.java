@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.UserStorage;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.util.exceptions.CreationErrorException;
 import ru.practicum.shareit.util.exceptions.EmailAlreadyExistException;
 import ru.practicum.shareit.util.exceptions.EntityNotExistException;
 
@@ -34,11 +33,6 @@ public class ImMemoryUserStorage implements UserStorage {
     public User create(User user) {
         emailDuplicatesCheck(user);
         updateId(user);
-
-        if (users.containsKey(user.getId())) {
-            log.info("Не удалось создать ползователя с id = {}", user.getId());
-            throw new CreationErrorException(String.format("Не удалось создать ползователя с id = %s", user.getId()));
-        }
 
         users.putIfAbsent(user.getId(), user);
         log.info("Создан пользователь c id = {} ", user.getId());
