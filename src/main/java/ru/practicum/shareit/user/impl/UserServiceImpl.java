@@ -4,29 +4,31 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.user.UserStorage;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.util.exceptions.CreationErrorException;
 import ru.practicum.shareit.util.exceptions.EntityNotExistException;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
 public class UserServiceImpl implements UserService {
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
     @Override
     public List<User> getAll() {
         log.info("Возвращен список всех пользователей");
-        return userStorage.getAll();
+        return userRepository.findAll();
     }
 
     @Override
     public User getById(long id) {
         log.info("Возвращен пользователь c id = {} ", id);
-        return userStorage.getById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotExistException(
                         String.format("Пользователь c id = %s не существует", id))
                 );
@@ -34,25 +36,44 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        return userStorage.create(user);
+        /*if (userRepository.findUserByEmail(user.getEmail()) != null) {
+            throw new CreationErrorException(
+                    String.format("Пользователь с email = %s уже существует", user.getEmail())
+            );
+        }*/
+        return userRepository.save(user); // todo ввести проверку не ConstraintViolationException
     }
 
+    @Transactional
     @Override
     public User update(User user) {
-        user = userStorage.update(user);
+        User oldUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new EntityNotExistException(
+                        String.format("Пользователь c id = %s не существует", user.getId()))
+                );
+
+        if (user.getName() != null && !user.getName().isBlank()) {
+            oldUser.setName(user.getName());
+        }
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            oldUser.setEmail(user.getEmail());
+        }
+
+        oldUser = userRepository.save(oldUser);
+
         log.info("Обновлен пользователь c id = {} ", user.getId());
-        return user;
+        return oldUser;
     }
 
     @Override
     public void deleteById(long id) {
-        userStorage.deleteById(id);
+        userRepository.deleteById(id);
         log.info("Удален пользователь c id = {} ", id);
     }
 
     @Override
     public void deleteAll() {
-        userStorage.deleteAll();
+        userRepository.deleteAll();
         log.info("Удалены все пользователи");
     }
 }

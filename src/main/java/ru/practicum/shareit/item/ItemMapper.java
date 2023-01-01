@@ -9,12 +9,14 @@ import ru.practicum.shareit.user.UserMapper;
 public class ItemMapper {
 
     public static Item toItem(ItemDto itemDto) {
-        return Item.builder()
-                .id(itemDto.getId())
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
-                .build();
+        Item item = new Item();
+
+        item.setId(itemDto.getId());
+        item.setName(itemDto.getName());
+        item.setDescription(itemDto.getDescription());
+        item.setIsAvailable(itemDto.getAvailable());
+
+        return item;
     }
 
     public static ItemDto toItemDto(Item item) {
@@ -22,7 +24,7 @@ public class ItemMapper {
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
-                .available(item.getAvailable())
+                .available(item.getIsAvailable())
                 .owner(UserMapper.toUserDto(item.getOwner()))
                 .build();
     }

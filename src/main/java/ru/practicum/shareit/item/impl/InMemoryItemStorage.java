@@ -35,7 +35,7 @@ public class InMemoryItemStorage implements ItemStorage {
         List<Item> items = new ArrayList<>();
         userItemIndex.values().forEach(items::addAll);
         return items.stream()
-                .filter(i -> i.getAvailable() && textCheck(text, i))
+                .filter(i -> i.getIsAvailable() && textCheck(text, i))
                 .collect(Collectors.toList());
     }
 
@@ -71,8 +71,8 @@ public class InMemoryItemStorage implements ItemStorage {
         if (item.getName() != null && !item.getName().isBlank()) {
             oldItem.setName(item.getName());
         }
-        if (item.getAvailable() != null) {
-            oldItem.setAvailable(item.getAvailable());
+        if (item.getIsAvailable() != null) {
+            oldItem.setIsAvailable(item.getIsAvailable());
         }
 
         return oldItem;

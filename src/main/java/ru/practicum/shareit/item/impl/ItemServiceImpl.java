@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.ItemService;
-import ru.practicum.shareit.item.ItemStorage;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.util.exceptions.EntityNotExistException;
 import ru.practicum.shareit.util.exceptions.UpdateErrorException;
@@ -16,30 +16,31 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
 public class ItemServiceImpl implements ItemService {
-    private final ItemStorage itemStorage;
+    private final ItemRepository itemRepository;
 
     @Override
     public List<Item> getAll() {
         log.info("Возвращен список всех вещей");
-        return itemStorage.getAll();
+        return itemRepository.findAll();
     }
 
     @Override
     public List<Item> getAllByUserId(long userId) {
         log.info("Возвращен список всех вещей пользователе с id = {}", userId);
-        return itemStorage.getAllByUserId(userId);
+        return itemRepository.findAllByOwner_Id(userId);
     }
 
     @Override
     public List<Item> getAllByText(String text) {
+        text = text.trim().toLowerCase();
         log.info("Возвращен список всех вещей со словом \"{}\" в названии или описании", text);
-        return itemStorage.getAllByText(text);
+        return itemRepository.findByText(text);
     }
 
     @Override
     public Item getById(long id) {
         log.info("Возвращена вещь c id = {} ", id);
-        return itemStorage.getById(id)
+        return itemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotExistException(
                         String.format("Вещь c id = %s не существует", id))
                 );
@@ -47,26 +48,43 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item create(Item item) {
-        return itemStorage.create(item);
+        return itemRepository.save(item);
     }
 
     @Override
     public Item update(Item item) {
         ownerIdCheck(item);
-        item = itemStorage.update(item);
+
+        Long itemId = item.getId();
+        Item oldItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotExistException(
+                        String.format("Вещь c id = %s не существует", itemId))
+                );
+
+        if (item.getDescription() != null && !item.getDescription().isBlank()) {
+            oldItem.setDescription(item.getDescription());
+        }
+        if (item.getName() != null && !item.getName().isBlank()) {
+            oldItem.setName(item.getName());
+        }
+        if (item.getIsAvailable() != null) {
+            oldItem.setIsAvailable(item.getIsAvailable());
+        }
+
+        oldItem = itemRepository.save(oldItem);
         log.info("Обновлена вещь c id = {} ", item.getId());
-        return item;
+        return oldItem;
     }
 
     @Override
     public void deleteById(long itemId, long userId) {
-        itemStorage.deleteById(itemId, userId);
+        itemRepository.deleteByIdAndOwnerId(itemId, userId);
         log.info("Удалена вещь c id = {} ", itemId);
     }
 
     @Override
     public void deleteAll() {
-        itemStorage.deleteAll();
+        itemRepository.deleteAll();
         log.info("Удалены все вещи");
     }
 
