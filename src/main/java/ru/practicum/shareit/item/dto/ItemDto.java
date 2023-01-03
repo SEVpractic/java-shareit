@@ -9,6 +9,7 @@ import ru.practicum.shareit.util.validation.CreateValidationGroup;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Builder(toBuilder = true)
 @Getter
@@ -24,6 +25,7 @@ public class ItemDto {
     private final UserDto owner;
     private final BookingShortDto lastBooking;
     private final BookingShortDto nextBooking;
+    private final List<CommentDto> comments;
 
     public void setId(Long id) {
         this.id = id;

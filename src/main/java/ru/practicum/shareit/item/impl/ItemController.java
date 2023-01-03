@@ -6,12 +6,16 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.util.validation.CreateValidationGroup;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,16 +33,23 @@ public class ItemController {
                            @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         Item item = itemService.getById(id);
         if (item.getOwner().getId() == userId) {
-            return ItemMapper.itemDtoForOwner(item, bookingService.findNearest(id));
+            return ItemMapper.itemDtoForOwner(
+                    item,
+                    bookingService.findNearest(id),
+                    itemService.getByItemId(id));
         }
-        return ItemMapper.toItemDto(item);
+        return ItemMapper.toItemDto(item, itemService.getByItemId(id));
     }
 
     @GetMapping
     public List<ItemDto> getAllByUserId(@RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         return itemService.getAllByUserId(userId)
                 .stream()
-                .map(i -> ItemMapper.itemDtoForOwner(i, bookingService.findNearest(i.getId())))
+                .map(item -> ItemMapper.itemDtoForOwner(
+                        item,
+                        bookingService.findNearest(item.getId()),
+                        itemService.getByItemId(item.getId())
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -48,7 +59,10 @@ public class ItemController {
 
         return itemService.getAllByText(text)
                 .stream()
-                .map(ItemMapper::toItemDto)
+                .map(item -> ItemMapper.toItemDto(
+                        item,
+                        itemService.getByItemId(item.getId())
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -58,7 +72,22 @@ public class ItemController {
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(userService.getById(userId));
         item = itemService.create(item);
-        return ItemMapper.toItemDto(item);
+        return ItemMapper.toItemDto(item, itemService.getByItemId(item.getId()));
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@PathVariable("itemId") @Positive long id,
+                                 @RequestHeader("X-Sharer-User-Id") @Positive long userId,
+                                 @Valid @RequestBody CommentDto commentDto) {
+        bookingService.checkItemBooking(userId, id);
+
+        Comment comment = CommentMapper.toComment(commentDto);
+        comment.setCreated(LocalDateTime.now());
+        comment.setItem(itemService.getById(id));
+        comment.setAuthor(userService.getById(userId));
+        comment = itemService.addComment(comment);
+
+        return CommentMapper.toCommentDto(comment);
     }
 
     @PatchMapping("/{itemId}")
@@ -69,7 +98,7 @@ public class ItemController {
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(userService.getById(userId));
         item = itemService.update(item);
-        return ItemMapper.toItemDto(item);
+        return ItemMapper.toItemDto(item, itemService.getByItemId(item.getId()));
     }
 
     @DeleteMapping("/{itemId}")

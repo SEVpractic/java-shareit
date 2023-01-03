@@ -69,4 +69,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "b.end = (select max(bo.end) from Booking as bo where bo.end < current_timestamp) " +
             "order by b.start ")
     List<Booking> findNearlyBookingByItemId(long itemId);
+
+    @Query("select count(b) from Booking  as b where b.item.id = ?1 and " +
+            "b.booker.id = ?2 and b.end < current_timestamp ")
+    Long findToCheck(Long itemId, Long bookerId);
 }

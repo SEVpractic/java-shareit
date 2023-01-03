@@ -116,7 +116,15 @@ public class BookingServiceImpl implements BookingService {
         bookings.add(0, bookingRepository.findLastByItemId(itemId));
         bookings.add(1, bookingRepository.findNextByItemId(itemId));
 
+        log.info("Возвращены последний и следующий запросы для вещи id = {} ", itemId);
         return bookings;
+    }
+
+    @Override
+    public void checkItemBooking(Long bookerId, Long itemId) {
+        if (bookingRepository.findToCheck(itemId, bookerId) < 1) {
+            throw new CreationErrorException("Оставлять отзыв может только пользователь, использовавший вещь");
+        }
     }
 
     private Booking getById(long id) {

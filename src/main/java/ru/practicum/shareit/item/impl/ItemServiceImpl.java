@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.item.CommentRepository;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.util.exceptions.EntityNotExistException;
 import ru.practicum.shareit.util.exceptions.UpdateErrorException;
@@ -17,6 +19,7 @@ import java.util.List;
 @Slf4j
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public List<Item> getAll() {
@@ -44,6 +47,12 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new EntityNotExistException(
                         String.format("Вещь c id = %s не существует", id))
                 );
+    }
+
+    @Override
+    public List<Comment> getByItemId(Long itemId) {
+        log.info("Возвращен сипок коментарием для вещи c id = {} ", itemId);
+        return commentRepository.findAllByItem_Id(itemId);
     }
 
     @Override
@@ -81,6 +90,13 @@ public class ItemServiceImpl implements ItemService {
     public void deleteById(long itemId, long userId) {
         itemRepository.deleteByIdAndOwnerId(itemId, userId);
         log.info("Удалена вещь c id = {} ", itemId);
+    }
+
+    @Override
+    public Comment addComment(Comment comment) {
+        log.info("Добавлен комментиарий вещи c id = {} от пользователя с id = {}",
+                comment.getItem().getId(), comment.getAuthor().getId());
+        return commentRepository.save(comment);
     }
 
     @Override

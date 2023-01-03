@@ -6,6 +6,8 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.impl.ItemMapper;
 import ru.practicum.shareit.user.impl.UserMapper;
 
+import java.util.List;
+
 @UtilityClass
 public class BookingMapper {
 
@@ -25,7 +27,7 @@ public class BookingMapper {
                 .id(booking.getId())
                 .start(booking.getStart())
                 .end(booking.getEnd())
-                .item(ItemMapper.toItemDto(booking.getItem()))
+                .item(ItemMapper.toItemDto(booking.getItem(), List.of()))
                 .booker(UserMapper.toUserDto(booking.getBooker()))
                 .status(booking.getStatus())
                 .build();

@@ -17,4 +17,6 @@ public interface BookingService {
     List<Booking> getAllByOwner(BookingState state, long userId);
 
     List<Booking> findNearest(long itemId);
+
+    void checkItemBooking(Long bookerId, Long itemId);
 }
