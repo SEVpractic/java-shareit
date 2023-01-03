@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.util.exceptions.CreationErrorException;
 import ru.practicum.shareit.util.exceptions.EntityNotExistException;
 
 import javax.transaction.Transactional;
@@ -36,12 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        /*if (userRepository.findUserByEmail(user.getEmail()) != null) {
-            throw new CreationErrorException(
-                    String.format("Пользователь с email = %s уже существует", user.getEmail())
-            );
-        }*/
-        return userRepository.save(user); // todo ввести проверку не ConstraintViolationException
+        return userRepository.save(user);
     }
 
     @Transactional

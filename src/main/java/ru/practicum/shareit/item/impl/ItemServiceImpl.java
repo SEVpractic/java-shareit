@@ -27,7 +27,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<Item> getAllByUserId(long userId) {
         log.info("Возвращен список всех вещей пользователе с id = {}", userId);
-        return itemRepository.findAllByOwner_Id(userId);
+        return itemRepository.findAllByOwner_IdOrderById(userId);
     }
 
     @Override
@@ -48,6 +48,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item create(Item item) {
+        log.info("Создана вещь c id = {} ", item.getId());
         return itemRepository.save(item);
     }
 

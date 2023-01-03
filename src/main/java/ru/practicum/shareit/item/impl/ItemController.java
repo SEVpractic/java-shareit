@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.util.CreateValidationGroup;
+import ru.practicum.shareit.util.validation.CreateValidationGroup;
 
 import javax.validation.constraints.Positive;
 import java.util.List;
@@ -22,10 +22,15 @@ import java.util.stream.Collectors;
 public class ItemController {
     private final ItemService itemService;
     private final UserService userService;
+    private final BookingService bookingService;
 
     @GetMapping("/{itemId}")
-    public ItemDto getById(@PathVariable("itemId") @Positive long id) {
+    public ItemDto getById(@PathVariable("itemId") @Positive long id,
+                           @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         Item item = itemService.getById(id);
+        if (item.getOwner().getId() == userId) {
+            return ItemMapper.itemDtoForOwner(item, bookingService.findNearest(id));
+        }
         return ItemMapper.toItemDto(item);
     }
 
@@ -33,7 +38,7 @@ public class ItemController {
     public List<ItemDto> getAllByUserId(@RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         return itemService.getAllByUserId(userId)
                 .stream()
-                .map(ItemMapper::toItemDto)
+                .map(i -> ItemMapper.itemDtoForOwner(i, bookingService.findNearest(i.getId())))// todo переделать это на сполшной запрос
                 .collect(Collectors.toList());
     }
 

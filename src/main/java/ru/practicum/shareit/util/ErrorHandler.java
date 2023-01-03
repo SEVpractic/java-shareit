@@ -1,6 +1,7 @@
 package ru.practicum.shareit.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ru.practicum.shareit.util.exceptions.EmailAlreadyExistException;
-import ru.practicum.shareit.util.exceptions.EntityNotExistException;
-import ru.practicum.shareit.util.exceptions.UpdateErrorException;
+import ru.practicum.shareit.util.exceptions.*;
 
 import javax.validation.ConstraintViolationException;
 
@@ -37,8 +36,6 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-
-
     @ExceptionHandler
     private ResponseEntity<Object> handleEmailAlreadyExistException(EmailAlreadyExistException ex) {
         log.info("409 {}", ex.getMessage());
@@ -52,9 +49,27 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
+    private ResponseEntity<Object> handleUserNotValidException(UserNotValidException ex) {
+        log.info("404 {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
     private ResponseEntity<Object> handleUpdateErrorException(UpdateErrorException ex) {
         log.info("404 {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<Object> handleBookingPatchException(BookingPatchException ex) {
+        log.info("400 {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<Object> handleCreationErrorException(CreationErrorException ex) {
+        log.info("400 {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
@@ -65,6 +80,18 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     private ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+        log.info("400 {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<Object> handleConversionFailedException(ConversionFailedException ex) {
+        log.info("400 {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.info("400 {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
