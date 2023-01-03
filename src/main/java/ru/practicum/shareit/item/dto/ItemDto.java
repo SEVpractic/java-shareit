@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import ru.practicum.shareit.booking.dto.ShortBookingDto;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.util.validation.CreateValidationGroup;
 
@@ -22,8 +22,8 @@ public class ItemDto {
     @NotNull (groups = CreateValidationGroup.class)
     private final Boolean available;
     private final UserDto owner;
-    private final ShortBookingDto lastBooking;
-    private final ShortBookingDto nextBooking;
+    private final BookingShortDto lastBooking;
+    private final BookingShortDto nextBooking;
 
     public void setId(Long id) {
         this.id = id;

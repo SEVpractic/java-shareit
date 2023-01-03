@@ -5,15 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingService;
-import ru.practicum.shareit.booking.model.BookingPair;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.BookingState;
-import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.model.*;
 import ru.practicum.shareit.util.exceptions.BookingPatchException;
 import ru.practicum.shareit.util.exceptions.CreationErrorException;
 import ru.practicum.shareit.util.exceptions.EntityNotExistException;
 import ru.practicum.shareit.util.exceptions.UserNotValidException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -75,7 +73,7 @@ public class BookingServiceImpl implements BookingService {
     public List<Booking> getAllByOwner(BookingState state, long userId) {
         log.info("Возвращена коллекция запросов на бронирование владельца id = {} ", userId);
 
-        switch (state) { //todo refactor
+        switch (state) {
             case CURRENT: // текущие
                 return bookingRepository.findAllCurrentByOwner(userId);
             case PAST: // завершённые
@@ -95,7 +93,7 @@ public class BookingServiceImpl implements BookingService {
     public List<Booking> getAllByBooker(BookingState state, long userId) {
         log.info("Возвращена коллекция запросов на бронирование пользователя id = {} ", userId);
 
-        switch (state) { // todo refactor
+        switch (state) {
             case CURRENT: // текущие
                 return bookingRepository.findAllCurrentByBooker(userId);
             case PAST: // завершённые
@@ -112,14 +110,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingPair findNearest(long itemId) {
-        Booking lastBooking = bookingRepository.findLastByItemId(itemId);
-        Booking nextBooking = bookingRepository.findNextByItemId(itemId);
+    public List<Booking> findNearest(long itemId) {
+        List<Booking> bookings = new ArrayList<>();
 
-        return new BookingPair(
-                lastBooking,
-                nextBooking
-        );
+        bookings.add(0, bookingRepository.findLastByItemId(itemId));
+        bookings.add(1, bookingRepository.findNextByItemId(itemId));
+
+        return bookings;
     }
 
     private Booking getById(long id) {

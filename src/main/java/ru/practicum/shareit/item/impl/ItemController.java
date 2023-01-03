@@ -38,7 +38,7 @@ public class ItemController {
     public List<ItemDto> getAllByUserId(@RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         return itemService.getAllByUserId(userId)
                 .stream()
-                .map(i -> ItemMapper.itemDtoForOwner(i, bookingService.findNearest(i.getId())))// todo переделать это на сполшной запрос
+                .map(i -> ItemMapper.itemDtoForOwner(i, bookingService.findNearest(i.getId())))
                 .collect(Collectors.toList());
     }
 

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import ru.practicum.shareit.booking.model.BookingPair;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 
@@ -17,5 +16,5 @@ public interface BookingService {
 
     List<Booking> getAllByOwner(BookingState state, long userId);
 
-    BookingPair findNearest(long itemId);
+    List<Booking> findNearest(long itemId);
 }

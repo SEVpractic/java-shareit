@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class ShortBookingDto {
+public class BookingShortDto {
     private final Long id;
     private final Long bookerId;
 }
