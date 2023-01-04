@@ -12,6 +12,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.UserService;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
@@ -55,7 +56,7 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDto> getAllByBooker(@RequestParam(name = "state", defaultValue = "ALL") BookingState state,
+    public List<BookingDto> getAllByBooker(@Valid @RequestParam(name = "state", defaultValue = "ALL") BookingState state,
                                            @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         userService.getById(userId);
         List<Booking> bookings = bookingService.getAllByBooker(state, userId);
@@ -66,8 +67,8 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getAllByOwner(@RequestParam(name = "state", defaultValue = "ALL") BookingState state,
-                                       @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
+    public List<BookingDto> getAllByOwner(@Valid @RequestParam(name = "state", defaultValue = "ALL") BookingState state,
+                                          @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         userService.getById(userId);
         List<Booking> bookings = bookingService.getAllByOwner(state, userId);
 

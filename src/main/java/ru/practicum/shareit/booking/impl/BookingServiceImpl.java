@@ -5,11 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingService;
-import ru.practicum.shareit.booking.model.*;
-import ru.practicum.shareit.util.exceptions.BookingPatchException;
-import ru.practicum.shareit.util.exceptions.CreationErrorException;
-import ru.practicum.shareit.util.exceptions.EntityNotExistException;
-import ru.practicum.shareit.util.exceptions.UserNotValidException;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingState;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.util.exceptions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +73,8 @@ public class BookingServiceImpl implements BookingService {
         log.info("Возвращена коллекция запросов на бронирование владельца id = {} ", userId);
 
         switch (state) {
+            case ALL: // все
+                return bookingRepository.findAllByOwner(userId);
             case CURRENT: // текущие
                 return bookingRepository.findAllCurrentByOwner(userId);
             case PAST: // завершённые
@@ -85,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED: // отклонённые
                 return bookingRepository.findAllRejectedByOwner(userId);
             default:
-                return bookingRepository.findAllByOwner(userId);
+                throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 
@@ -94,6 +95,8 @@ public class BookingServiceImpl implements BookingService {
         log.info("Возвращена коллекция запросов на бронирование пользователя id = {} ", userId);
 
         switch (state) {
+            case ALL: // все
+                return bookingRepository.findAllByBooker(userId);
             case CURRENT: // текущие
                 return bookingRepository.findAllCurrentByBooker(userId);
             case PAST: // завершённые
@@ -105,7 +108,7 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED: // отклонённые
                 return bookingRepository.findAllRejectedByBooker(userId);
             default:
-                return bookingRepository.findAllByBooker(userId);
+                throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 

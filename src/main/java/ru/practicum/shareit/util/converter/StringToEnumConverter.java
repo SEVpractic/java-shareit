@@ -6,6 +6,10 @@ import ru.practicum.shareit.booking.model.BookingState;
 public class StringToEnumConverter implements Converter<String, BookingState> {
     @Override
     public BookingState convert(String source) {
-        return BookingState.valueOf(source.toUpperCase());
+        try {
+            return BookingState.valueOf(source.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return BookingState.UNSUPPORTED_STATUS;
+        }
     }
 }

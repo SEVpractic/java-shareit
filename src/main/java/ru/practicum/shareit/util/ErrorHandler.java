@@ -1,5 +1,8 @@
 package ru.practicum.shareit.util;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpHeaders;
@@ -94,5 +97,22 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.info("400 {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<ExceptionDto> handleUnsupportedStatusException(UnsupportedStatusException ex) {
+        log.info("400 {}", ex.getMessage());
+        return new ResponseEntity<>(new ExceptionDto("Unknown state: UNSUPPORTED_STATUS"), HttpStatus.BAD_REQUEST);
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    private static class ExceptionDto { // todo delete
+        private final String errorMessage;
+
+        @JsonGetter(value = "Error")
+        public String getErrorMessage() {
+            return errorMessage;
+        }
     }
 }

@@ -6,5 +6,7 @@ public enum BookingState {
     PAST, // завершённые
     FUTURE, // будущие
     WAITING, // ожидающие подтверждения
-    REJECTED; // отклонённые
+    REJECTED, // отклонённые
+    UNSUPPORTED_STATUS; // неподдерживаемый статус
+
 }
