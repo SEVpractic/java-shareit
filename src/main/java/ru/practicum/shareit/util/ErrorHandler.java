@@ -107,12 +107,12 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
 
     @Getter
     @RequiredArgsConstructor
-    private static class ExceptionDto { // todo delete
-        private final String errorMessage;
+    private static class ExceptionDto {
+        private final String error;
 
-        @JsonGetter(value = "Error")
-        public String getErrorMessage() {
-            return errorMessage;
+        @JsonGetter(value = "error")
+        public String getError() {
+            return error;
         }
     }
 }

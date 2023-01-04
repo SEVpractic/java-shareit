@@ -8,5 +8,4 @@ public enum BookingState {
     WAITING, // ожидающие подтверждения
     REJECTED, // отклонённые
     UNSUPPORTED_STATUS; // неподдерживаемый статус
-
 }

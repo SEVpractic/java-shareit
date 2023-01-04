@@ -86,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED: // отклонённые
                 return bookingRepository.findAllRejectedByOwner(userId);
             default:
-                throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
+                throw new UnsupportedStatusException("Неподдерживаемый параметр BookingState");
         }
     }
 
@@ -108,7 +108,7 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED: // отклонённые
                 return bookingRepository.findAllRejectedByBooker(userId);
             default:
-                throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
+                throw new UnsupportedStatusException("Неподдерживаемый параметр BookingState");
         }
     }
 
