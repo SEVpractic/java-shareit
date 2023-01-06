@@ -21,7 +21,6 @@ import ru.practicum.shareit.util.exceptions.CreationErrorException;
 import ru.practicum.shareit.util.exceptions.EntityNotExistException;
 import ru.practicum.shareit.util.exceptions.UpdateErrorException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
