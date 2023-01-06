@@ -19,11 +19,11 @@ public class Comment {
     private Long id;
     @Column(name = "text", nullable = false)
     private String text;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "author_id", unique = true)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "author_id")
     private User author;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "item_id", unique = true)
+    @JoinColumn(name = "item_id")
     private Item item;
     @Column(name = "created")
     private LocalDateTime created;

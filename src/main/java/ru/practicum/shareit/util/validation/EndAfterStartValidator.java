@@ -1,13 +1,15 @@
 package ru.practicum.shareit.util.validation;
 
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingIncomeDto;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class EndAfterStartValidator implements ConstraintValidator<EndAfterStartValidation, BookingDto> {
+public class EndAfterStartValidator implements ConstraintValidator<EndAfterStartValidation, BookingIncomeDto> {
     @Override
-    public boolean isValid(BookingDto bookingDto, ConstraintValidatorContext constraintValidatorContext) {
-        return bookingDto.getStart().isBefore(bookingDto.getEnd());
+    public boolean isValid(BookingIncomeDto bookingDto, ConstraintValidatorContext constraintValidatorContext) {
+        return bookingDto.getStart() != null &&
+                bookingDto.getEnd() != null &&
+                bookingDto.getStart().isBefore(bookingDto.getEnd());
     }
 }

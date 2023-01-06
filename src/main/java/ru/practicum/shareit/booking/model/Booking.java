@@ -22,11 +22,11 @@ public class Booking {
     private LocalDateTime start;
     @Column(name = "end_date", nullable = false)
     private LocalDateTime end;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "item_id", unique = true)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "item_id")
     private Item item;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "booker_id", unique = true)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "booker_id")
     private User booker;
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

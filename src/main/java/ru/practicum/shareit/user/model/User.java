@@ -14,9 +14,9 @@ public class User {
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "name", nullable = false, unique = true, updatable = true)
+    @Column(name = "name", nullable = false, updatable = true)
     private String name;
-    @Column(name = "email", nullable = false, updatable = true)
+    @Column(name = "email", nullable = false, updatable = true, unique = true)
     private String email;
 
     @Override

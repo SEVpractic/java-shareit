@@ -21,9 +21,9 @@ public class Item {
     @Column(name = "description", nullable = false)
     private String description;
     @Column(name = "is_available")
-    private Boolean isAvailable;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "owner_id", unique = true)
+    private boolean isAvailable;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "owner_id")
     private User owner;
 
 
