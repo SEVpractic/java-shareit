@@ -1,22 +1,38 @@
 package ru.practicum.shareit.booking.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
 @Builder(toBuilder = true)
 @Getter
-@Setter
 public class BookingDto {
     private final Long id;
     private final LocalDateTime start;
     private final LocalDateTime end;
-    private final ItemDto item;
-    private final UserDto booker;
+    private final ShortItemDto item;
+    private final ShortBookerDto booker;
     private BookingStatus status;
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class ShortBookerDto {
+        @JsonProperty(value = "id")
+        private final long bookerId;
+        @JsonProperty(value = "name")
+        private final String bookerName;
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class ShortItemDto {
+        @JsonProperty(value = "id")
+        private final long itemId;
+        @JsonProperty(value = "name")
+        private final String itemName;
+    }
 }

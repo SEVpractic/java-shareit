@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemIncomeDto;
 import ru.practicum.shareit.util.validation.CreateValidationGroup;
+import ru.practicum.shareit.util.validation.UpdateValidationGroup;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -53,7 +54,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto update(@PathVariable("itemId") @Positive long itemId,
                           @RequestHeader("X-Sharer-User-Id") @Positive long userId,
-                          @Valid @RequestBody ItemIncomeDto itemDto) {
+                          @Validated(UpdateValidationGroup.class) @RequestBody ItemIncomeDto itemDto) {
         return itemService.update(itemDto, itemId, userId);
     }
 

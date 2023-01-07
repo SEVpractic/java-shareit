@@ -4,8 +4,6 @@ import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingIncomeDto;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.impl.ItemMapper;
-import ru.practicum.shareit.user.impl.UserMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,15 +24,21 @@ public class BookingMapper {
                 .id(booking.getId())
                 .start(booking.getStart())
                 .end(booking.getEnd())
-                .item(ItemMapper.toItemDto(booking.getItem(), List.of()))
-                .booker(UserMapper.toUserDto(booking.getBooker()))
+                .item(new BookingDto.ShortItemDto(
+                        booking.getItem().getId(),
+                        booking.getItem().getName()
+                ))
+                .booker(new BookingDto.ShortBookerDto(
+                        booking.getBooker().getId(),
+                        booking.getBooker().getName()
+                ))
                 .status(booking.getStatus())
                 .build();
     }
 
     public static List<BookingDto> toBookingDto(List<Booking> bookings) {
         return bookings.stream()
-                .map(booking -> BookingMapper.toBookingDto(booking))
+                .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 }
