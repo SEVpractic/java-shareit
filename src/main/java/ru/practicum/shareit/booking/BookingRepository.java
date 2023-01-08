@@ -51,9 +51,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllCurrentByOwner(long userId, Sort sort);
 
     @Query("select b from Booking as b where b.item in ?1 and b.status = 'APPROVED' and " +
-            "b.start = (select min(bo.start) from Booking as bo where bo.start > current_timestamp) or " +
+            "(b.start = (select min(bo.start) from Booking as bo where bo.start > current_timestamp) or " +
             "b.end = (select max(bo.end) from Booking as bo where bo.end < current_timestamp or " +
-            "bo.end = current_timestamp or bo.start = current_timestamp ) " +
+            "bo.end = current_timestamp or bo.start = current_timestamp )) " +
             "order by b.start ")
     List<Booking> findNearlyBookingByItemIn(List<Item> items);
 
