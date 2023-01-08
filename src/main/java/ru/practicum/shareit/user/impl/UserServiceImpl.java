@@ -4,55 +4,76 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.user.UserStorage;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserIncomeDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.exceptions.EntityNotExistException;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
 public class UserServiceImpl implements UserService {
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
     @Override
-    public List<User> getAll() {
+    public List<UserDto> getAll() {
+        List<User> users = userRepository.findAll();
         log.info("Возвращен список всех пользователей");
-        return userStorage.getAll();
+        return UserMapper.toUserDto(users);
     }
 
     @Override
-    public User getById(long id) {
-        log.info("Возвращен пользователь c id = {} ", id);
-        return userStorage.getById(id)
-                .orElseThrow(() -> new EntityNotExistException(
-                        String.format("Пользователь c id = %s не существует", id))
-                );
+    public UserDto getById(long userId) {
+        User user = findById(userId);
+        log.info("Возвращен пользователь c id = {} ", userId);
+        return UserMapper.toUserDto(user);
     }
 
     @Override
-    public User create(User user) {
-        return userStorage.create(user);
+    public UserDto create(UserIncomeDto userDto) {
+        User user = UserMapper.toUser(userDto);
+        user = userRepository.save(user);
+        log.info("Создан пользователь c id = {} ", user.getId());
+        return UserMapper.toUserDto(user);
     }
 
+    @Transactional
     @Override
-    public User update(User user) {
-        user = userStorage.update(user);
+    public UserDto update(UserIncomeDto userDto, long userId) {
+        User user = findById(userId);
+
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            user.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            user.setEmail(userDto.getEmail());
+        }
+
         log.info("Обновлен пользователь c id = {} ", user.getId());
-        return user;
+        return UserMapper.toUserDto(user);
     }
 
     @Override
     public void deleteById(long id) {
-        userStorage.deleteById(id);
+        userRepository.deleteById(id);
         log.info("Удален пользователь c id = {} ", id);
     }
 
     @Override
     public void deleteAll() {
-        userStorage.deleteAll();
+        userRepository.deleteAll();
         log.info("Удалены все пользователи");
+    }
+
+    private User findById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotExistException(
+                        String.format("Пользователь c id = %s не существует", userId))
+                );
     }
 }

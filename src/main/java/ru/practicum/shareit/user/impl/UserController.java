@@ -4,16 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.util.CreateValidationGroup;
-import ru.practicum.shareit.util.UpdateValidationGroup;
+import ru.practicum.shareit.user.dto.UserIncomeDto;
+import ru.practicum.shareit.util.validation.CreateValidationGroup;
+import ru.practicum.shareit.util.validation.UpdateValidationGroup;
 
 import javax.validation.constraints.Positive;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -24,35 +22,28 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAll() {
-        List<User> users = userService.getAll();
-        return users.stream()
-                .map(UserMapper::toUserDto)
-                .collect(Collectors.toList());
+        return userService.getAll();
     }
 
     @GetMapping("/{userId}")
-    public UserDto getById(@PathVariable("userId") @Positive long id) {
-        User user = userService.getById(id);
-        return UserMapper.toUserDto(user);
+    public UserDto getById(@PathVariable("userId") @Positive long userId) {
+        return userService.getById(userId);
     }
 
     @PostMapping
-    public UserDto create(@Validated(CreateValidationGroup.class) @RequestBody UserDto userDto) {
-        User user = userService.create(UserMapper.toUser(userDto));
-        return UserMapper.toUserDto(user);
+    public UserDto create(@Validated(CreateValidationGroup.class) @RequestBody UserIncomeDto userDto) {
+        return userService.create(userDto);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@Validated(UpdateValidationGroup.class) @RequestBody UserDto userDto,
-                          @PathVariable("userId") @Positive Long id) {
-        userDto.setId(id);
-        User user = userService.update(UserMapper.toUser(userDto));
-        return UserMapper.toUserDto(user);
+    public UserDto update(@Validated(UpdateValidationGroup.class) @RequestBody UserIncomeDto userDto,
+                          @PathVariable("userId") @Positive long userId) {
+        return userService.update(userDto, userId);
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteById(@PathVariable("userId") @Positive long id) {
-        userService.deleteById(id);
+    public void deleteById(@PathVariable("userId") @Positive long userId) {
+        userService.deleteById(userId);
     }
 
     @DeleteMapping

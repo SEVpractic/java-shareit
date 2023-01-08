@@ -4,16 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.util.CreateValidationGroup;
+import ru.practicum.shareit.item.dto.ItemIncomeDto;
+import ru.practicum.shareit.util.validation.CreateValidationGroup;
+import ru.practicum.shareit.util.validation.UpdateValidationGroup;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/items")
@@ -21,50 +21,41 @@ import java.util.stream.Collectors;
 @Validated
 public class ItemController {
     private final ItemService itemService;
-    private final UserService userService;
 
     @GetMapping("/{itemId}")
-    public ItemDto getById(@PathVariable("itemId") @Positive long id) {
-        Item item = itemService.getById(id);
-        return ItemMapper.toItemDto(item);
+    public ItemDto getById(@PathVariable("itemId") @Positive long itemId,
+                           @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
+        return itemService.getById(itemId, userId);
     }
 
     @GetMapping
     public List<ItemDto> getAllByUserId(@RequestHeader("X-Sharer-User-Id") @Positive long userId) {
-        return itemService.getAllByUserId(userId)
-                .stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return itemService.getAllByUserId(userId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> getAllByText(@RequestParam(name = "text") String text) {
-        if (text.isBlank()) return List.of();
-
-        return itemService.getAllByText(text)
-                .stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return itemService.getAllByText(text);
     }
 
     @PostMapping
-    public ItemDto create(@Validated(CreateValidationGroup.class) @RequestBody ItemDto itemDto,
+    public ItemDto create(@Validated(CreateValidationGroup.class) @RequestBody ItemIncomeDto itemDto,
                           @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
-        Item item = ItemMapper.toItem(itemDto);
-        item.setOwner(userService.getById(userId));
-        item = itemService.create(item);
-        return ItemMapper.toItemDto(item);
+        return itemService.create(itemDto, userId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@PathVariable("itemId") @Positive long itemId,
+                                 @RequestHeader("X-Sharer-User-Id") @Positive long userId,
+                                 @Valid @RequestBody CommentDto commentDto) {
+        return itemService.addComment(commentDto, itemId, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(@PathVariable("itemId") @Positive long id,
+    public ItemDto update(@PathVariable("itemId") @Positive long itemId,
                           @RequestHeader("X-Sharer-User-Id") @Positive long userId,
-                          @RequestBody ItemDto itemDto) {
-        itemDto.setId(id);
-        Item item = ItemMapper.toItem(itemDto);
-        item.setOwner(userService.getById(userId));
-        item = itemService.update(item);
-        return ItemMapper.toItemDto(item);
+                          @Validated(UpdateValidationGroup.class) @RequestBody ItemIncomeDto itemDto) {
+        return itemService.update(itemDto, itemId, userId);
     }
 
     @DeleteMapping("/{itemId}")
