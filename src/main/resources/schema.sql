@@ -38,3 +38,5 @@ CREATE table IF NOT EXISTS requests(
     requestor_id bigint REFERENCES users (user_id) ON DELETE CASCADE,
     created timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE items ADD COLUMN target_request_id bigint REFERENCES requests (request_id) ON DELETE CASCADE;

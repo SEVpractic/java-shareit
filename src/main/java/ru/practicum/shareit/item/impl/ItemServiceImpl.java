@@ -15,6 +15,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemIncomeDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.exceptions.CreationErrorException;
@@ -32,7 +34,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-
+    private final ItemRequestRepository requestRepository;
     private final BookingRepository bookingRepository;
 
     @Override
@@ -89,6 +91,9 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(ItemIncomeDto itemDto, long userId) {
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(findUserById(userId));
+        if (itemDto.getRequestId() != null) {
+            item.setItemRequest(findItemRequestById(itemDto.getRequestId()));
+        }
 
         item = itemRepository.save(item);
         log.info("Создана вещь c id = {} ", item.getId());
@@ -191,5 +196,12 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
+    }
+
+    private ItemRequest findItemRequestById(Long requestId) {
+        return requestRepository.findById(requestId)
+                .orElseThrow(
+                        () -> new EntityNotExistException(
+                                String.format("Запрос c id = %s не существует", requestId)));
     }
 }

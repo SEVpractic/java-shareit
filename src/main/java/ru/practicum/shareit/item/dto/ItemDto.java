@@ -18,6 +18,7 @@ public class ItemDto {
     private final BookingShortDto lastBooking;
     private final BookingShortDto nextBooking;
     private final List<CommentDto> comments;
+    private final Long requestId;
 
     public void setId(Long id) {
         this.id = id;

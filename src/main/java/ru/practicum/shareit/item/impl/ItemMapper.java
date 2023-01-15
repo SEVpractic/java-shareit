@@ -33,6 +33,7 @@ public class ItemMapper {
                 .available(item.isAvailable())
                 .owner(UserMapper.toUserDto(item.getOwner()))
                 .comments(comments.stream().map(CommentMapper::toCommentDto).collect(Collectors.toList()))
+                .requestId(item.getItemRequest() == null ? null : item.getItemRequest().getId())
                 .build();
     }
 

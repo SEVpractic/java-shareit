@@ -21,4 +21,5 @@ public class ItemIncomeDto {
     private final String description;
     @NotNull(groups = CreateValidationGroup.class)
     private final Boolean available;
+    private final Long requestId;
 }
