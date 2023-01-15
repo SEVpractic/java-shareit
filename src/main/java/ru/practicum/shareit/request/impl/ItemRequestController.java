@@ -4,13 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.request.dto.ItemRequestDtoForOwner;
 import ru.practicum.shareit.request.RequestService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestDtoForOwner;
 import ru.practicum.shareit.request.dto.ItemRequestIncomeDto;
 import ru.practicum.shareit.util.validation.CreateValidationGroup;
 
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -31,12 +32,12 @@ public class ItemRequestController {
         return requestService.getForOwner(userId);
     }
 
-    /*@GetMapping("/all")
-    public List<ItemRequestDto> getAll(@PathVariable("from") @Positive long from,
-                                       @PathVariable("size") @Positive long size,
+    @GetMapping("/all")
+    public List<ItemRequestDtoForOwner> getAll(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                       @RequestParam(defaultValue = "10") @Positive int size,
                                        @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
-        return null;
-    }*/
+        return requestService.getAll(from, size, userId);
+    }
 
     @GetMapping("{requestId}")
     public ItemRequestDtoForOwner getById(@PathVariable("requestId") @Positive long requestId,

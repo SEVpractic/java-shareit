@@ -9,6 +9,8 @@ import java.util.List;
 public interface RequestService {
     ItemRequestDto create(ItemRequestIncomeDto requestDto, long userId);
 
+    List<ItemRequestDtoForOwner> getAll(int from, int size, long userId);
+
     ItemRequestDtoForOwner getById(long requestId, long userId);
 
     List<ItemRequestDtoForOwner> getForOwner(long userId);

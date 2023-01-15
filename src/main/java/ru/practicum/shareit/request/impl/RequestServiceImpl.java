@@ -2,6 +2,8 @@ package ru.practicum.shareit.request.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.ItemRepository;
@@ -34,6 +36,7 @@ public class RequestServiceImpl implements RequestService {
         ItemRequest itemRequest = ItemRequestMapper.toItemRequest(requestDto, requestor);
 
         itemRequest = itemRequestRepository.save(itemRequest);
+        log.info("Сщздан запрос c id = {} ", itemRequest.getId());
 
         return ItemRequestMapper.toItemRequestDto(itemRequest);
     }
@@ -56,6 +59,23 @@ public class RequestServiceImpl implements RequestService {
         Map<ItemRequest, List<Item>> itemsByRequests = findItemsByRequests(itemRequests);
 
         log.info("Возвращена коллекция запросов на бронирование владельца id = {} ", userId);
+        return ItemRequestMapper.toItemRequestDtoForOwner(itemRequests, itemsByRequests);
+    }
+
+    @Override
+    public List<ItemRequestDtoForOwner> getAll(int from, int size, long userId) {
+        findUserById(userId);
+
+        Pageable pageable = PageRequest.of(
+                from == 0 ? 0 : (from / size),
+                size,
+                Sort.by(Sort.Direction.DESC, "created")
+        );
+        List<ItemRequest> itemRequests = itemRequestRepository.findAllForeign(userId, pageable)
+                .toList();
+        Map<ItemRequest, List<Item>> itemsByRequests = findItemsByRequests(itemRequests);
+
+        log.info("Возвращена коллекция запросов на бронирование");
         return ItemRequestMapper.toItemRequestDtoForOwner(itemRequests, itemsByRequests);
     }
 
