@@ -1,7 +1,7 @@
 package ru.practicum.shareit.request.impl;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.item.dto.ItemRequestDtoForOwner;
+import ru.practicum.shareit.request.dto.ItemRequestDtoForOwner;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestIncomeDto;
@@ -39,7 +39,9 @@ public class ItemRequestMapper {
         return ItemRequestDtoForOwner.ShortItemResponseDto.builder()
                 .itemId(item.getId())
                 .itemName(item.getName())
-                .ownersId(item.getOwner().getId())
+                .description(item.getDescription())
+                .available(item.isAvailable())
+                .requestId(item.getItemRequest().getId())
                 .build();
     }
 
@@ -49,7 +51,7 @@ public class ItemRequestMapper {
                 .id(itemRequest.getId())
                 .description(itemRequest.getDescription())
                 .created(itemRequest.getCreated())
-                .responses(
+                .items(
                         items.stream()
                                 .map(ItemRequestMapper::toShortItemResponseDto)
                                 .collect(Collectors.toList())
@@ -57,9 +59,13 @@ public class ItemRequestMapper {
                 .build();
     }
 
-    public static List<ItemRequestDtoForOwner> toItemRequestDtoForOwner(Map<ItemRequest, List<Item>> itemsByRequests) {
-        return itemsByRequests.keySet().stream()
-                .map(itemRequest -> toItemRequestDtoForOwner(itemRequest, itemsByRequests.get(itemRequest)))
+    public static List<ItemRequestDtoForOwner> toItemRequestDtoForOwner(List<ItemRequest> itemRequests,
+                                                                        Map<ItemRequest, List<Item>> itemsByRequests) {
+        return itemRequests.stream()
+                .map(itemRequest -> toItemRequestDtoForOwner(
+                        itemRequest,
+                        itemsByRequests.getOrDefault(itemRequest, List.of())
+                ))
                 .collect(Collectors.toList());
     }
 }

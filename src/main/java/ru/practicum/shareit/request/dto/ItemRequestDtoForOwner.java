@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.request.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -13,16 +13,21 @@ public class ItemRequestDtoForOwner {
     private final Long id;
     private final String description;
     private final LocalDateTime created;
-    private final List<ShortItemResponseDto> responses;
+    private final List<ShortItemResponseDto> items;
 
     @Builder(toBuilder = true)
     @Getter
     public static class ShortItemResponseDto {
-        @JsonProperty(value = "itemId")
+        @JsonProperty(value = "id")
         private final long itemId;
         @JsonProperty(value = "name")
         private final String itemName;
-        @JsonProperty(value = "ownersId")
-        private final Long ownersId;
+        @JsonProperty(value = "description")
+        private final String description;
+        @JsonProperty(value = "available")
+        private final Boolean available;
+        @JsonProperty(value = "requestId")
+        private final Long requestId;
+
     }
 }

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.item.dto.ItemRequestDtoForOwner;
+import ru.practicum.shareit.request.dto.ItemRequestDtoForOwner;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.request.RequestService;
@@ -39,12 +39,13 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public ItemRequestDto getById(long requestId, long userId) {
+    public ItemRequestDtoForOwner getById(long requestId, long userId) {
         findUserById(userId);
         ItemRequest itemRequest = findById(requestId);
+        List<Item> itemsByRequest = findItemsByRequest(itemRequest);
 
         log.info("Возвращен запрос c id = {} ", userId);
-        return ItemRequestMapper.toItemRequestDto(itemRequest);
+        return ItemRequestMapper.toItemRequestDtoForOwner(itemRequest, itemsByRequest);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class RequestServiceImpl implements RequestService {
         Map<ItemRequest, List<Item>> itemsByRequests = findItemsByRequests(itemRequests);
 
         log.info("Возвращена коллекция запросов на бронирование владельца id = {} ", userId);
-        return ItemRequestMapper.toItemRequestDtoForOwner(itemsByRequests);
+        return ItemRequestMapper.toItemRequestDtoForOwner(itemRequests, itemsByRequests);
     }
 
     private ItemRequest findById(long requestId) {
@@ -76,5 +77,9 @@ public class RequestServiceImpl implements RequestService {
         return itemRepository.findAllByRequestIdIn(requests)
                 .stream()
                 .collect(Collectors.groupingBy(Item::getItemRequest, Collectors.toList()));
+    }
+
+    private List<Item> findItemsByRequest(ItemRequest request) {
+        return itemRepository.findAllByItemRequest(request);
     }
 }
