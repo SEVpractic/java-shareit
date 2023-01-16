@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.request.dto.ItemRequestDtoForOwner;
+import ru.practicum.shareit.request.dto.ItemRequestLongDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.request.RequestService;
@@ -42,7 +42,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public ItemRequestDtoForOwner getById(long requestId, long userId) {
+    public ItemRequestLongDto getById(long requestId, long userId) {
         findUserById(userId);
         ItemRequest itemRequest = findById(requestId);
         List<Item> itemsByRequest = findItemsByRequest(itemRequest);
@@ -52,7 +52,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<ItemRequestDtoForOwner> getForOwner(long userId) {
+    public List<ItemRequestLongDto> getForOwner(long userId) {
         findUserById(userId);
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
         List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequestor_Id(userId, sort);
@@ -63,7 +63,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<ItemRequestDtoForOwner> getAll(int from, int size, long userId) {
+    public List<ItemRequestLongDto> getAll(int from, int size, long userId) {
         findUserById(userId);
 
         Pageable pageable = PageRequest.of(

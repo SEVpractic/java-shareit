@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.RequestService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.dto.ItemRequestDtoForOwner;
+import ru.practicum.shareit.request.dto.ItemRequestLongDto;
 import ru.practicum.shareit.request.dto.ItemRequestIncomeDto;
 import ru.practicum.shareit.util.validation.CreateValidationGroup;
 
@@ -28,20 +28,20 @@ public class ItemRequestController {
     }
 
     @GetMapping
-    public List<ItemRequestDtoForOwner> getForOwner(@RequestHeader("X-Sharer-User-Id") @Positive long userId) {
+    public List<ItemRequestLongDto> getForOwner(@RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         return requestService.getForOwner(userId);
     }
 
     @GetMapping("/all")
-    public List<ItemRequestDtoForOwner> getAll(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                               @RequestParam(defaultValue = "10") @Positive int size,
-                                               @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
+    public List<ItemRequestLongDto> getAll(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                           @RequestParam(defaultValue = "10") @Positive int size,
+                                           @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         return requestService.getAll(from, size, userId);
     }
 
     @GetMapping("{requestId}")
-    public ItemRequestDtoForOwner getById(@PathVariable("requestId") @Positive long requestId,
-                                          @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
+    public ItemRequestLongDto getById(@PathVariable("requestId") @Positive long requestId,
+                                      @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         return requestService.getById(requestId, userId);
     }
 }

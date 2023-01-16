@@ -9,7 +9,7 @@ import java.util.List;
 
 @Builder(toBuilder = true)
 @Getter
-public class ItemRequestDtoForOwner { // todo переименовать в соответствии с назначением класса
+public class ItemRequestLongDto {
     private final Long id;
     private final String description;
     private final LocalDateTime created;

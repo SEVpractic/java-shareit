@@ -1,7 +1,7 @@
 package ru.practicum.shareit.request.impl;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.request.dto.ItemRequestDtoForOwner;
+import ru.practicum.shareit.request.dto.ItemRequestLongDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestIncomeDto;
@@ -35,8 +35,8 @@ public class ItemRequestMapper {
                 .created(itemRequest.getCreated())
                 .build();
     }
-    public static ItemRequestDtoForOwner.ShortItemResponseDto toShortItemResponseDto(Item item) {
-        return ItemRequestDtoForOwner.ShortItemResponseDto.builder()
+    public static ItemRequestLongDto.ShortItemResponseDto toShortItemResponseDto(Item item) {
+        return ItemRequestLongDto.ShortItemResponseDto.builder()
                 .itemId(item.getId())
                 .itemName(item.getName())
                 .description(item.getDescription())
@@ -45,9 +45,9 @@ public class ItemRequestMapper {
                 .build();
     }
 
-    public static ItemRequestDtoForOwner toItemRequestDtoForOwner(ItemRequest itemRequest,
-                                                                  List<Item> items) {
-        return ItemRequestDtoForOwner.builder()
+    public static ItemRequestLongDto toItemRequestDtoForOwner(ItemRequest itemRequest,
+                                                              List<Item> items) {
+        return ItemRequestLongDto.builder()
                 .id(itemRequest.getId())
                 .description(itemRequest.getDescription())
                 .created(itemRequest.getCreated())
@@ -59,8 +59,8 @@ public class ItemRequestMapper {
                 .build();
     }
 
-    public static List<ItemRequestDtoForOwner> toItemRequestDtoForOwner(List<ItemRequest> itemRequests,
-                                                                        Map<ItemRequest, List<Item>> itemsByRequests) {
+    public static List<ItemRequestLongDto> toItemRequestDtoForOwner(List<ItemRequest> itemRequests,
+                                                                    Map<ItemRequest, List<Item>> itemsByRequests) {
         return itemRequests.stream()
                 .map(itemRequest -> toItemRequestDtoForOwner(
                         itemRequest,
