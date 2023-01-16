@@ -3,6 +3,9 @@ package ru.practicum.shareit.item.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -60,8 +63,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAllByUserId(long userId) {
-        List<Item> items = itemRepository.findAllByOwner_IdOrderById(userId);
+    public List<ItemDto> getAllByUserId(int from, int size, long userId) {
+        Pageable pageable = PageRequest.of(
+                from == 0 ? 0 : (from / size),
+                size
+        );
+
+        List<Item> items = itemRepository.findAllByOwner_IdOrderById(userId, pageable);
         Map<Item, List<Booking>> bookings = findNearestBookings(items);
         Map<Item, List<Comment>> comments = findComments(items);
 
@@ -70,11 +78,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAllByText(String text) {
+    public List<ItemDto> getAllByText(int from, int size, String text) {
         if (text.isBlank()) return List.of();
+        Pageable pageable = PageRequest.of(
+                from == 0 ? 0 : (from / size),
+                size
+        );
 
         text = text.trim().toLowerCase();
-        List<Item> items = itemRepository.findByText(text);
+        List<Item> items = itemRepository.findByText(text, pageable);
         Map<Item, List<Comment>> comments = findComments(items);
 
         log.info("Возвращен список всех вещей со словом \"{}\" в названии или описании", text);

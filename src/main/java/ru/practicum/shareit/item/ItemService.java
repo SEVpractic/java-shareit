@@ -13,9 +13,9 @@ public interface ItemService {
 
     ItemDto getById(long itemId, long userId);
 
-    List<ItemDto> getAllByUserId(long userId);
+    List<ItemDto> getAllByUserId(int from, int size, long userId);
 
-    List<ItemDto> getAllByText(String text);
+    List<ItemDto> getAllByText(int from, int size, String text);
 
     List<Comment> getByItemId(Long itemId);
 
