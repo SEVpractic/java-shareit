@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,66 +72,76 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllByOwner(BookingState state, long userId) {
+    public List<BookingDto> getAllByOwner(int from, int size, BookingState state, long userId) {
         List<Booking> bookings;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
         findUserById(userId);
-        log.info("Возвращена коллекция запросов на бронирование владельца id = {} ", userId);
+        Pageable pageable = PageRequest.of(
+                from == 0 ? 0 : (from / size),
+                size,
+                Sort.by(Sort.Direction.DESC, "start")
+        );
 
         switch (state) {
             case ALL: // все
-                bookings = bookingRepository.findAllByOwner(userId, sort);
+                bookings = bookingRepository.findAllByOwner(userId, pageable).toList();
                 break;
             case CURRENT: // текущие
-                bookings = bookingRepository.findAllCurrentByOwner(userId, sort);
+                bookings = bookingRepository.findAllCurrentByOwner(userId, pageable).toList();
                 break;
             case PAST: // завершённые
-                bookings = bookingRepository.findAllPastByOwner(userId, sort);
+                bookings = bookingRepository.findAllPastByOwner(userId, pageable).toList();
                 break;
             case FUTURE: // будущие
-                bookings = bookingRepository.findAllFutureByOwner(userId, sort);
+                bookings = bookingRepository.findAllFutureByOwner(userId, pageable).toList();
                 break;
             case WAITING: // ожидающие подтверждения
-                bookings = bookingRepository.findAllWaitingByOwner(userId, sort);
+                bookings = bookingRepository.findAllWaitingByOwner(userId, pageable).toList();
                 break;
             case REJECTED: // отклонённые
-                bookings = bookingRepository.findAllRejectedByOwner(userId, sort);
+                bookings = bookingRepository.findAllRejectedByOwner(userId, pageable).toList();
                 break;
             default:
                 throw new UnsupportedStatusException("Неподдерживаемый параметр BookingState");
         }
+
+        log.info("Возвращена коллекция запросов на бронирование владельца id = {} ", userId);
         return BookingMapper.toBookingDto(bookings);
     }
 
     @Override
-    public List<BookingDto> getAllByBooker(BookingState state, long userId) {
+    public List<BookingDto> getAllByBooker(int from, int size, BookingState state, long userId) {
         List<Booking> bookings;
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
         findUserById(userId);
-        log.info("Возвращена коллекция запросов на бронирование пользователя id = {} ", userId);
+        Pageable pageable = PageRequest.of(
+                from == 0 ? 0 : (from / size),
+                size,
+                Sort.by(Sort.Direction.DESC, "start")
+        );
 
         switch (state) {
             case ALL: // все
-                bookings = bookingRepository.findAllByBooker(userId, sort);
+                bookings = bookingRepository.findAllByBooker(userId, pageable).toList();
                 break;
             case CURRENT: // текущие
-                bookings = bookingRepository.findAllCurrentByBooker(userId, sort);
+                bookings = bookingRepository.findAllCurrentByBooker(userId, pageable).toList();
                 break;
             case PAST: // завершённые
-                bookings = bookingRepository.findAllPastByBooker(userId, sort);
+                bookings = bookingRepository.findAllPastByBooker(userId, pageable).toList();
                 break;
             case FUTURE: // будущие
-                bookings = bookingRepository.findAllFutureByBooker(userId, sort);
+                bookings = bookingRepository.findAllFutureByBooker(userId, pageable).toList();
                 break;
             case WAITING: // ожидающие подтверждения
-                bookings = bookingRepository.findAllWaitingByBooker(userId, sort);
+                bookings = bookingRepository.findAllWaitingByBooker(userId, pageable).toList();
                 break;
             case REJECTED: // отклонённые
-                bookings = bookingRepository.findAllRejectedByBooker(userId, sort);
+                bookings = bookingRepository.findAllRejectedByBooker(userId, pageable).toList();
                 break;
             default:
                 throw new UnsupportedStatusException("Неподдерживаемый параметр BookingState");
         }
+
+        log.info("Возвращена коллекция запросов на бронирование пользователя id = {} ", userId);
         return BookingMapper.toBookingDto(bookings);
     }
 

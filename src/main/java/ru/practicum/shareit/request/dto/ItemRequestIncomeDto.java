@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemRequestIncomeDto {
-    @NotBlank (groups = CreateValidationGroup.class) // todo переделать без групп, если дальше не нужны
+    @NotBlank (groups = CreateValidationGroup.class)
     private final String description;
-    private Long id; // todo понять почему нельзя делать дто из одной строки
+    private Long id;
 }

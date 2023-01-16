@@ -34,14 +34,14 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDtoForOwner> getAll(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                       @RequestParam(defaultValue = "10") @Positive int size,
-                                       @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
+                                               @RequestParam(defaultValue = "10") @Positive int size,
+                                               @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         return requestService.getAll(from, size, userId);
     }
 
     @GetMapping("{requestId}")
     public ItemRequestDtoForOwner getById(@PathVariable("requestId") @Positive long requestId,
-                                  @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
+                                          @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         return requestService.getById(requestId, userId);
     }
 }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,42 +14,42 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select b from Booking as b where b.booker.id = ?1")
-    List<Booking> findAllByBooker(long userId, Sort sort);
+    Page<Booking> findAllByBooker(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.booker.id = ?1 and b.status = 'WAITING'")
-    List<Booking> findAllWaitingByBooker(long userId, Sort sort);
+    Page<Booking> findAllWaitingByBooker(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.booker.id = ?1 and b.status = 'REJECTED'")
-    List<Booking> findAllRejectedByBooker(long userId, Sort sort);
+    Page<Booking> findAllRejectedByBooker(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.booker.id = ?1 and b.end < current_timestamp")
-    List<Booking> findAllPastByBooker(long userId, Sort sort);
+    Page<Booking> findAllPastByBooker(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.booker.id = ?1 and b.start > current_timestamp")
-    List<Booking> findAllFutureByBooker(long userId, Sort sort);
+    Page<Booking> findAllFutureByBooker(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.booker.id = ?1 and " +
             "current_timestamp between b.start and b.end")
-    List<Booking> findAllCurrentByBooker(long userId, Sort sort);
+    Page<Booking> findAllCurrentByBooker(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.item.owner.id = ?1")
-    List<Booking> findAllByOwner(long userId, Sort sort);
+    Page<Booking> findAllByOwner(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.item.owner.id = ?1 and b.status = 'WAITING'")
-    List<Booking> findAllWaitingByOwner(long userId, Sort sort);
+    Page<Booking> findAllWaitingByOwner(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.item.owner.id = ?1 and b.status = 'REJECTED'")
-    List<Booking> findAllRejectedByOwner(long userId, Sort sort);
+    Page<Booking> findAllRejectedByOwner(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.item.owner.id = ?1 and b.end < current_timestamp")
-    List<Booking> findAllPastByOwner(long userId, Sort sort);
+    Page<Booking> findAllPastByOwner(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.item.owner.id = ?1 and b.start > current_timestamp")
-    List<Booking> findAllFutureByOwner(long userId, Sort sort);
+    Page<Booking> findAllFutureByOwner(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.item.owner.id = ?1 and " +
             "current_timestamp between b.start and b.end")
-    List<Booking> findAllCurrentByOwner(long userId, Sort sort);
+    Page<Booking> findAllCurrentByOwner(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.item in ?1 and b.status = 'APPROVED' and " +
             "(b.start = (select min(bo.start) from Booking as bo where bo.start > current_timestamp) or " +
