@@ -40,12 +40,7 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
 
     @Override
-    public List<Item> getAll() {
-        log.info("Возвращен список всех вещей");
-        return itemRepository.findAll();
-    }
-
-    @Override
+    @Transactional
     public ItemDto getById(long itemId, long userId) {
         Item item = findById(itemId);
 
@@ -62,6 +57,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public List<ItemDto> getAllByUserId(int from, int size, long userId) {
         Pageable pageable = PageRequest.of(
                 from == 0 ? 0 : (from / size),
@@ -77,6 +73,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public List<ItemDto> getAllByText(int from, int size, String text) {
         if (text.isBlank()) return List.of();
         Pageable pageable = PageRequest.of(
@@ -99,6 +96,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto create(ItemIncomeDto itemDto, long userId) {
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(findUserById(userId));
@@ -124,11 +122,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void deleteById(long itemId, long userId) {
-        itemRepository.deleteByIdAndOwnerId(itemId, userId);
+        itemRepository.deleteItemByIdAndOwner_Id(itemId, userId);
         log.info("Удалена вещь c id = {} ", itemId);
     }
 
     @Override
+    @Transactional
     public CommentDto addComment(CommentDto commentDto, long itemId, long userId) {
         checkItemBooking(itemId, userId);
 

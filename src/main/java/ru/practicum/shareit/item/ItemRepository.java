@@ -18,7 +18,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "lower(it.description) like concat('%', lower(?1), '%')) ")
     List<Item> findByText(String text, Pageable pageable);
 
-    void deleteByIdAndOwnerId(long itemId, long userId);
+    void deleteItemByIdAndOwner_Id(long itemId, long userId);
 
     @Query("select it from Item as it where it.itemRequest in ?1")
     List<Item> findAllByRequestIdIn(List<ItemRequest> requests);
