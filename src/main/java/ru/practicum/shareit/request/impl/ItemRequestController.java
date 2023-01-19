@@ -39,7 +39,7 @@ public class ItemRequestController {
         return requestService.getAll(from, size, userId);
     }
 
-    @GetMapping("{requestId}")
+    @GetMapping("/{requestId}")
     public ItemRequestLongDto getById(@PathVariable("requestId") @Positive long requestId,
                                       @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         return requestService.getById(requestId, userId);

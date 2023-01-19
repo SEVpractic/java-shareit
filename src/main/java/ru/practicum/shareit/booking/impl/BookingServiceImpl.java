@@ -32,6 +32,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
 
     @Override
+    @Transactional
     public BookingDto create(BookingIncomeDto bookingDto, Long userId) {
         Booking booking = fillBooking(bookingDto, userId);
         bookingCreationCheck(booking);
@@ -59,6 +60,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto getById(long id, long userId) {
         Booking booking = findById(id);
 
