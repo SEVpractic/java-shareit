@@ -6,13 +6,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.request.dto.ItemRequestLongDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.request.RequestService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestIncomeDto;
+import ru.practicum.shareit.request.dto.ItemRequestLongDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
@@ -31,12 +32,13 @@ public class RequestServiceImpl implements RequestService {
     private final ItemRepository itemRepository;
 
     @Override
+    @Transactional
     public ItemRequestDto create(ItemRequestIncomeDto requestDto, long userId) {
         User requestor = findUserById(userId);
         ItemRequest itemRequest = ItemRequestMapper.toItemRequest(requestDto, requestor);
 
         itemRequest = itemRequestRepository.save(itemRequest);
-        log.info("Сщздан запрос c id = {} ", itemRequest.getId());
+        log.info("Создан запрос c id = {} ", itemRequest.getId());
 
         return ItemRequestMapper.toItemRequestDto(itemRequest);
     }
@@ -52,6 +54,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public List<ItemRequestLongDto> getForOwner(long userId) {
         findUserById(userId);
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
@@ -63,6 +66,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public List<ItemRequestLongDto> getAll(int from, int size, long userId) {
         findUserById(userId);
 

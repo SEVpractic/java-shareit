@@ -3,6 +3,7 @@ package ru.practicum.shareit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,7 +20,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -132,7 +132,7 @@ class ItemControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        assertEquals(objectMapper.writeValueAsString(itemDto), content);
+        Assertions.assertEquals(objectMapper.writeValueAsString(itemDto), content);
     }
 
     @SneakyThrows
@@ -198,7 +198,7 @@ class ItemControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        assertEquals(objectMapper.writeValueAsString(itemDto), content);
+        Assertions.assertEquals(objectMapper.writeValueAsString(itemDto), content);
     }
 
     @SneakyThrows
@@ -223,7 +223,7 @@ class ItemControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        assertEquals(objectMapper.writeValueAsString(commentDto), content);
+        Assertions.assertEquals(objectMapper.writeValueAsString(commentDto), content);
     }
 
     @SneakyThrows

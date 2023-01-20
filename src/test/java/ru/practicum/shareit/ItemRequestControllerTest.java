@@ -3,6 +3,7 @@ package ru.practicum.shareit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,7 +18,6 @@ import ru.practicum.shareit.request.impl.ItemRequestController;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ItemRequestController.class)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class ItemRequestControllerTest {
+class ItemRequestControllerTest {
     private final ObjectMapper objectMapper;
     private final MockMvc mockMvc;
     @MockBean
@@ -111,6 +111,6 @@ public class ItemRequestControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        assertEquals(objectMapper.writeValueAsString(itemRequestDto), content);
+        Assertions.assertEquals(objectMapper.writeValueAsString(itemRequestDto), content);
     }
 }

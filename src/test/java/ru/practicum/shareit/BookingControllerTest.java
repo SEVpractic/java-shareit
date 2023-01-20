@@ -3,6 +3,7 @@ package ru.practicum.shareit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,7 +20,6 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = BookingController.class)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class BookingControllerTest {
+class BookingControllerTest {
     private final ObjectMapper objectMapper;
     private final MockMvc mockMvc;
     @MockBean
@@ -117,7 +117,7 @@ public class BookingControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        assertEquals(objectMapper.writeValueAsString(bookingDto), content);
+        Assertions.assertEquals(objectMapper.writeValueAsString(bookingDto), content);
     }
 
     @SneakyThrows
