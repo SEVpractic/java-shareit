@@ -114,7 +114,11 @@ class ItemServiceTest {
                 .available(true)
                 .build();
 
-        assertThrows(UpdateErrorException.class, () -> itemService.update(incomeDto,1L, 2L));
+        UpdateErrorException exception = assertThrows(UpdateErrorException.class,
+                () -> itemService.update(incomeDto, 1L, 2L));
+
+        assertThat(exception)
+                .hasMessage("Ошибка обновления вещи c id = 1 , невозможно обновить вещь другого пользователя");
     }
 
     @Test
@@ -235,4 +239,39 @@ class ItemServiceTest {
         assertThat(items.get(0))
                 .hasFieldOrPropertyWithValue("name", "item2");
     }
+
+    @Test
+    @Order(13)
+    void deleteAll() {
+        itemService.deleteAll();
+        List<ItemDto> items = itemService.getAllByUserId(0, 10, 1L);
+
+        assertThat(items)
+                .isEmpty();
+    }
+
+    @Test
+    @Order(14)
+    @Sql(value = {"/request-create-test.sql"})
+    void CreateTestWithRequest() {
+        ItemIncomeDto incomeDto = ItemIncomeDto.builder()
+                .name("item")
+                .description("users 3 item")
+                .available(true)
+                .requestId(1L)
+                .build();
+        Optional<ItemDto> itemDto = Optional.of(itemService.create(incomeDto, 3L));
+
+        assertThat(itemDto)
+                .isPresent()
+                .hasValueSatisfying(i -> {
+                    assertThat(i).hasFieldOrPropertyWithValue("id", 7L);
+                    assertThat(i).hasFieldOrPropertyWithValue("name", "item");
+                    assertThat(i).hasFieldOrPropertyWithValue("description", "users 3 item");
+                    assertThat(i).hasFieldOrPropertyWithValue("available", true);
+                    assertThat(i).hasFieldOrPropertyWithValue("requestId", 1L);
+                });
+    }
+
+
 }

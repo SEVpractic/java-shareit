@@ -121,6 +121,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public void deleteById(long itemId, long userId) {
         itemRepository.deleteItemByIdAndOwner_Id(itemId, userId);
         log.info("Удалена вещь c id = {} ", itemId);

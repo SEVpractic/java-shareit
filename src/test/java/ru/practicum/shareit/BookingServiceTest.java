@@ -41,6 +41,7 @@ class BookingServiceTest {
                 .start(LocalDateTime.now().plusDays(1))
                 .end(LocalDateTime.now().plusDays(2))
                 .build();
+
         Optional<BookingDto> bookingDto = Optional.of(bookingService.create(incomeDto, 2L));
 
         assertThat(bookingDto)

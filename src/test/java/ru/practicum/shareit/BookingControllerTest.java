@@ -33,7 +33,7 @@ class BookingControllerTest {
     private final ObjectMapper objectMapper;
     private final MockMvc mockMvc;
     @MockBean
-    BookingService bookingService;
+    private BookingService bookingService;
 
     @SneakyThrows
     @Test
@@ -156,5 +156,17 @@ class BookingControllerTest {
                 .andExpect(status().isOk());
 
         verify(bookingService).confirm(bookingId, userId, approved);
+    }
+
+    @SneakyThrows
+    @Test
+    void getAllByOwner_UNSUPPORTED_STATUS_thenReturnBadRequest() {
+        long userId = 1L;
+        String state = "abracadabra";
+        mockMvc.perform(get("/bookings/owner?state={state}", state)
+                        .header("X-Sharer-User-Id", userId))
+                .andDo(print());
+
+        verify(bookingService).getAllByOwner(0, 10, BookingState.UNSUPPORTED_STATUS, 1L);
     }
 }
