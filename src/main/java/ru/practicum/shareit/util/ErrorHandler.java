@@ -40,12 +40,6 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
-    private ResponseEntity<Object> handleEmailAlreadyExistException(EmailAlreadyExistException ex) {
-        log.info("409 {}", ex.getMessage());
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler
     private ResponseEntity<Object> handleEntityNotExistException(EntityNotExistException ex) {
         log.info("404 {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);

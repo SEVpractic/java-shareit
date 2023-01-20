@@ -31,7 +31,7 @@ class UserServiceTest {
     @Test
     @Order(0)
     @Sql(value = { "/test-schema.sql" })
-    void createAndUpdateTest() {
+    void createTest() {
         UserIncomeDto userCreateDto = UserIncomeDto.builder()
                 .name("user")
                 .email("user@yandex.ru")

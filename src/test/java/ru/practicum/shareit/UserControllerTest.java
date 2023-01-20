@@ -15,6 +15,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserIncomeDto;
 import ru.practicum.shareit.user.impl.UserController;
 
+import javax.validation.ConstraintViolationException;
 import java.nio.charset.StandardCharsets;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -176,5 +177,28 @@ class UserControllerTest {
                 .andExpect(status().isOk());
 
         verify(userService).deleteAll();
+    }
+
+    @SneakyThrows
+    @Test
+    void createTest_emailAlreadyExist_thenReturnBadRequest() {
+        UserIncomeDto userIncomeDto = UserIncomeDto.builder()
+                .name("User")
+                .email("user@yandex.ru")
+                .build();
+
+        when(userService.create(any())).thenThrow(ConstraintViolationException.class);
+        mockMvc.perform(
+                        post("/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(userIncomeDto))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
     }
 }
