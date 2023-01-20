@@ -253,7 +253,7 @@ class ItemServiceTest {
     @Test
     @Order(14)
     @Sql(value = {"/request-create-test.sql"})
-    void CreateTestWithRequest() {
+    void createTestWithRequest() {
         ItemIncomeDto incomeDto = ItemIncomeDto.builder()
                 .name("item")
                 .description("users 3 item")
