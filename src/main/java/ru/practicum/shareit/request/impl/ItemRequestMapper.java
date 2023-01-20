@@ -35,6 +35,7 @@ public class ItemRequestMapper {
                 .created(itemRequest.getCreated())
                 .build();
     }
+
     public static ItemRequestLongDto.ShortItemResponseDto toShortItemResponseDto(Item item) {
         return ItemRequestLongDto.ShortItemResponseDto.builder()
                 .itemId(item.getId())

@@ -150,7 +150,9 @@ class BookingMockServiceTest {
         bookingService.getAllByOwner(from, size, BookingState.REJECTED, userId);
 
         verify(bookingRepository).findAllRejectedByOwner(userId, pageable);
-    }@Test
+    }
+
+    @Test
     void getAllByOwner_unsupported_calRejectedQuery() {
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(new User()));
