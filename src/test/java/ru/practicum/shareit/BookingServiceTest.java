@@ -143,4 +143,47 @@ class BookingServiceTest {
                     assertThat(i).hasFieldOrPropertyWithValue("status", BookingStatus.REJECTED);
                 });
     }
+
+    @Test
+    @Order(8)
+    void createWithNotExistItemTest() {
+        BookingIncomeDto incomeDto = BookingIncomeDto.builder()
+                .itemId(100L)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .build();
+
+        assertThrows(EntityNotExistException.class, () -> bookingService.create(incomeDto, 2L));
+    }
+
+    @Test
+    @Order(8)
+    void createWithNotExistUserTest() {
+        BookingIncomeDto incomeDto = BookingIncomeDto.builder()
+                .itemId(1L)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .build();
+
+        assertThrows(EntityNotExistException.class, () -> bookingService.create(incomeDto, 200L));
+    }
+
+    @Test
+    @Order(9)
+    @Sql(value = { "/all-bookings-create-test.sql" })
+    void confirmNotByOwnerTest() {
+        assertThrows(UserNotValidException.class, () -> bookingService.confirm(3L, 2L, true));
+    }
+
+    @Test
+    @Order(10)
+    void createFromUserTest() {
+        BookingIncomeDto incomeDto = BookingIncomeDto.builder()
+                .itemId(1L)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .build();
+
+        assertThrows(UserNotValidException.class, () -> bookingService.create(incomeDto, 1L));
+    }
 }

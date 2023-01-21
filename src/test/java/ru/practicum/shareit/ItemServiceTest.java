@@ -273,5 +273,35 @@ class ItemServiceTest {
                 });
     }
 
+    @Test
+    @Order(15)
+    void createRequestNotExistTest() {
+        ItemIncomeDto incomeDto = ItemIncomeDto.builder()
+                .name("item")
+                .description("users 1 item")
+                .available(false)
+                .requestId(100L)
+                .build();
 
+        assertThrows(EntityNotExistException.class, () -> itemService.create(incomeDto, 1L));
+    }
+
+    @Test
+    @Order(16)
+    void createUserNotExistTest() {
+        ItemIncomeDto incomeDto = ItemIncomeDto.builder()
+                .name("item")
+                .description("users 1 item")
+                .available(false)
+                .build();
+
+        assertThrows(EntityNotExistException.class, () -> itemService.create(incomeDto, 100L));
+    }
+
+    @Test
+    @Order(17)
+    void deleteByIdTest() {
+        itemService.deleteById(1L, 1L);
+        assertThrows(EntityNotExistException.class, () -> itemService.getById(1L, 1L));
+    }
 }
