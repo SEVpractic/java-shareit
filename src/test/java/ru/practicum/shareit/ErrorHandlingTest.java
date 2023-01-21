@@ -37,7 +37,7 @@ class ErrorHandlingTest {
 
     @SneakyThrows
     @Test
-    void EntityNotExistExceptionTest() {
+    void entityNotExistExceptionTest() {
         long userId = 10L;
         mockMvc.perform(get("/users/{userId}", userId))
                 .andDo(print())
@@ -46,7 +46,7 @@ class ErrorHandlingTest {
 
     @SneakyThrows
     @Test
-    void UserNotValidExceptionTest() {
+    void userNotValidExceptionTest() {
         long bookingId = 1L;
         long userId = 3L;
         mockMvc.perform(get("/bookings/{bookingId}", bookingId)
@@ -57,7 +57,7 @@ class ErrorHandlingTest {
 
     @SneakyThrows
     @Test
-    void UpdateErrorExceptionTest() {
+    void updateErrorExceptionTest() {
         long itemId = 1L;
         long userId = 3L;
         ItemIncomeDto incomeDto = ItemIncomeDto.builder()
@@ -78,7 +78,7 @@ class ErrorHandlingTest {
 
     @SneakyThrows
     @Test
-    void BookingPatchExceptionTest() {
+    void bookingPatchExceptionTest() {
         long bookingId = 1L;
         long userId = 3L;
         boolean approved = false;
@@ -91,7 +91,7 @@ class ErrorHandlingTest {
 
     @SneakyThrows
     @Test
-    void UnsupportedStatusExceptionTest() {
+    void unsupportedStatusExceptionTest() {
         long userId = 3L;
         String state = "abracadabra";
 
@@ -103,7 +103,7 @@ class ErrorHandlingTest {
 
     @SneakyThrows
     @Test
-    void CreationErrorExceptionTest() {
+    void creationErrorExceptionTest() {
         long itemId = 1L;
         long userId = 3L;
         CommentDto commentDto = CommentDto.builder()
