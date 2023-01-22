@@ -13,7 +13,8 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    @Query("select b from Booking as b where b.booker.id = ?1")
+    @Query("select distinct b from Booking as b " +
+            "where b.booker.id = ?1 ")
     Page<Booking> findAllByBooker(long userId, Pageable pageable);
 
     @Query("select b from Booking as b where b.booker.id = ?1 and b.status = 'WAITING'")

@@ -74,6 +74,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public List<BookingDto> getAllByOwner(int from, int size, BookingState state, long userId) {
         List<Booking> bookings;
         findUserById(userId);
@@ -111,6 +112,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public List<BookingDto> getAllByBooker(int from, int size, BookingState state, long userId) {
         List<Booking> bookings;
         findUserById(userId);

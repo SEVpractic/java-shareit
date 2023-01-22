@@ -1,6 +1,7 @@
 package ru.practicum.shareit;
 
 import lombok.RequiredArgsConstructor;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingIncomeDto;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.util.exceptions.BookingPatchException;
 import ru.practicum.shareit.util.exceptions.CreationErrorException;
@@ -20,6 +22,7 @@ import ru.practicum.shareit.util.exceptions.EntityNotExistException;
 import ru.practicum.shareit.util.exceptions.UserNotValidException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -185,5 +188,79 @@ class BookingServiceTest {
                 .build();
 
         assertThrows(UserNotValidException.class, () -> bookingService.create(incomeDto, 1L));
+    }
+
+    @Test
+    @Order(11)
+    void getAllByOwnerTest() {
+        int from = 0;
+        int size = 10;
+        BookingState state = BookingState.ALL;
+        long userId = 1L;
+        List<BookingDto> bookings = bookingService.getAllByOwner(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .hasSize(5);
+
+        state = BookingState.CURRENT;
+        bookings = bookingService.getAllByOwner(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .isEmpty();
+
+        state = BookingState.PAST;
+        bookings = bookingService.getAllByOwner(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .hasSize(1);
+
+        state = BookingState.FUTURE;
+        bookings = bookingService.getAllByOwner(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .hasSize(4);
+
+        state = BookingState.WAITING;
+        bookings = bookingService.getAllByOwner(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .hasSize(1);
+
+        state = BookingState.REJECTED;
+        bookings = bookingService.getAllByOwner(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .hasSize(2);
+    }
+
+    @Test
+    @Order(11)
+    void getAllByBookerTest() {
+        int from = 0;
+        int size = 10;
+        BookingState state = BookingState.ALL;
+        long userId = 2L;
+        List<BookingDto> bookings = bookingService.getAllByBooker(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .hasSize(5);
+
+        state = BookingState.CURRENT;
+        bookings = bookingService.getAllByBooker(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .isEmpty();
+
+        state = BookingState.PAST;
+        bookings = bookingService.getAllByBooker(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .hasSize(1);
+
+        state = BookingState.FUTURE;
+        bookings = bookingService.getAllByBooker(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .hasSize(4);
+
+        state = BookingState.WAITING;
+        bookings = bookingService.getAllByBooker(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .hasSize(1);
+
+        state = BookingState.REJECTED;
+        bookings = bookingService.getAllByBooker(from, size, state, userId);
+        Assertions.assertThat(bookings)
+                .hasSize(2);
     }
 }
