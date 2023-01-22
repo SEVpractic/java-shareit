@@ -1,10 +1,7 @@
 package ru.practicum.shareit;
 
-import lombok.RequiredArgsConstructor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingIncomeDto;
 import ru.practicum.shareit.booking.impl.BookingMapper;
@@ -16,9 +13,7 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@ExtendWith(MockitoExtension.class)
 class BookingMapperTest {
-    private BookingMapper bookingMapper;
 
     @Test
     void toBookingTest() {
@@ -31,7 +26,7 @@ class BookingMapperTest {
                 .itemId(1L)
                 .build();
 
-        Booking booking = bookingMapper.toBooking(incomeDto);
+        Booking booking = BookingMapper.toBooking(incomeDto);
 
         Assertions.assertThat(booking)
                 .hasFieldOrPropertyWithValue("id", null)
@@ -43,7 +38,7 @@ class BookingMapperTest {
     void toBookingDtoTest() {
         Booking booking = fillEntity();
 
-        BookingDto bookingDto = bookingMapper.toBookingDto(booking);
+        BookingDto bookingDto = BookingMapper.toBookingDto(booking);
 
         Assertions.assertThat(bookingDto)
                 .hasFieldOrPropertyWithValue("id", 1L)
@@ -64,7 +59,7 @@ class BookingMapperTest {
     void toBookingDtosTest() {
         List<Booking> bookings = List.of(fillEntity());
 
-        List<BookingDto> bookingDtos = bookingMapper.toBookingDto(bookings);
+        List<BookingDto> bookingDtos = BookingMapper.toBookingDto(bookings);
 
         Assertions.assertThat(bookingDtos)
                 .hasSize(1);
