@@ -70,6 +70,10 @@ class RequestServiceTest {
                     assertThat(i).hasFieldOrProperty("items");
                     assertThat(i.getItems()).hasSize(5);
                     assertThat(i.getItems().get(0)).hasFieldOrPropertyWithValue("itemId", 1L);
+                    assertThat(i.getItems().get(0)).hasFieldOrPropertyWithValue("itemName", "item1");
+                    assertThat(i.getItems().get(0)).hasFieldOrPropertyWithValue("description", "description1");
+                    assertThat(i.getItems().get(0)).hasFieldOrPropertyWithValue("available", true);
+                    assertThat(i.getItems().get(0)).hasFieldOrPropertyWithValue("requestId", 1L);
                 });
     }
 

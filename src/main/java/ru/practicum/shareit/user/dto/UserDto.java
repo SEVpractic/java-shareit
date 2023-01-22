@@ -9,8 +9,4 @@ public class UserDto {
     private Long id;
     private final String name;
     private final String email;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 }
