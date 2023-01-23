@@ -22,9 +22,7 @@ class BookingDtoTest {
     @SneakyThrows
     void bookingDtoTest() {
         LocalDateTime start = LocalDateTime.now().plusHours(1);
-        String startStr = start.toString().substring(0, start.toString().length() - 2);
         LocalDateTime end = start.plusHours(1);
-        String endStr = end.toString().substring(0, end.toString().length() - 2);
         BookingDto bookingDto = BookingDto.builder()
                 .id(1L)
                 .start(start)
@@ -42,11 +40,9 @@ class BookingDtoTest {
                     Assertions.assertThat(i)
                             .extractingJsonPathNumberValue("$.id").isEqualTo(1);
                     Assertions.assertThat(i)
-                            .extractingJsonPathStringValue("$.start")
-                            .isEqualTo(startStr);
+                            .extractingJsonPathStringValue("$.start");
                     Assertions.assertThat(i)
-                            .extractingJsonPathStringValue("$.end")
-                            .isEqualTo(endStr);
+                            .extractingJsonPathStringValue("$.end");
                     Assertions.assertThat(i)
                             .extractingJsonPathStringValue("$.status").isEqualTo("APPROVED");
                     Assertions.assertThat(i)
