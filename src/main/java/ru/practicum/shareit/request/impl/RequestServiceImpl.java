@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class RequestServiceImpl implements RequestService {
     private final UserRepository userRepository;
     private final ItemRequestRepository itemRequestRepository;
@@ -54,7 +55,6 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @Transactional
     public List<ItemRequestLongDto> getForOwner(long userId) {
         findUserById(userId);
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
@@ -66,7 +66,6 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @Transactional
     public List<ItemRequestLongDto> getAll(int from, int size, long userId) {
         findUserById(userId);
 

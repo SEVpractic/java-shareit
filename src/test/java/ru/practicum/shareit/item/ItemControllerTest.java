@@ -1,16 +1,20 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.item.ItemService;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemIncomeDto;
@@ -19,11 +23,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ItemController.class)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -38,12 +37,12 @@ class ItemControllerTest {
     void getById_correctUser_thenReturnOk() {
         long itemId = 1L;
         long userId = 1L;
-        mockMvc.perform(get("/items/{itemId}", itemId)
+        mockMvc.perform(MockMvcRequestBuilders.get("/items/{itemId}", itemId)
                         .header("X-Sharer-User-Id", userId))
-                .andDo(print())
-                .andExpect(status().isOk());
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        verify(itemService).getById(itemId, userId);
+        Mockito.verify(itemService).getById(itemId, userId);
     }
 
     @SneakyThrows
@@ -51,23 +50,23 @@ class ItemControllerTest {
     void getById_unCorrectUser_thenReturnBadRequest() {
         long itemId = 1L;
         long userId = 1L;
-        mockMvc.perform(get("/items/{itemId}", itemId))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders.get("/items/{itemId}", itemId))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
-        verify(itemService, never()).getById(itemId, userId);
+        Mockito.verify(itemService, Mockito.never()).getById(itemId, userId);
     }
 
     @SneakyThrows
     @Test
     void getAllByUserId_withoutPaginationParams_thenReturnOk() {
         long userId = 1L;
-        mockMvc.perform(get("/items")
+        mockMvc.perform(MockMvcRequestBuilders.get("/items")
                         .header("X-Sharer-User-Id", userId))
-                .andDo(print())
-                .andExpect(status().isOk());
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        verify(itemService).getAllByUserId(0, 10, userId);
+        Mockito.verify(itemService).getAllByUserId(0, 10, userId);
     }
 
     @SneakyThrows
@@ -76,23 +75,23 @@ class ItemControllerTest {
         long userId = 1L;
         int from = 3;
         int size = 2;
-        mockMvc.perform(get("/items?from={from}&size={size}", from, size)
+        mockMvc.perform(MockMvcRequestBuilders.get("/items?from={from}&size={size}", from, size)
                         .header("X-Sharer-User-Id", userId))
-                .andDo(print())
-                .andExpect(status().isOk());
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        verify(itemService).getAllByUserId(3, 2, userId);
+        Mockito.verify(itemService).getAllByUserId(3, 2, userId);
     }
 
     @SneakyThrows
     @Test
     void getAllByText_withoutPaginationParams_thenReturnOk() {
         String text = "java forever";
-        mockMvc.perform(get("/items/search?text={text}", text))
-                .andDo(print())
-                .andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.get("/items/search?text={text}", text))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        verify(itemService).getAllByText(0, 10, text);
+        Mockito.verify(itemService).getAllByText(0, 10, text);
     }
 
     @SneakyThrows
@@ -120,14 +119,14 @@ class ItemControllerTest {
                 .requestId(null)
                 .build();
 
-        when(itemService.create(any(), anyLong())).thenReturn(itemDto);
-        String content = mockMvc.perform(post("/items")
+        Mockito.when(itemService.create(ArgumentMatchers.any(), ArgumentMatchers.anyLong())).thenReturn(itemDto);
+        String content = mockMvc.perform(MockMvcRequestBuilders.post("/items")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(incomeDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -146,18 +145,18 @@ class ItemControllerTest {
                 .requestId(null)
                 .build();
 
-        mockMvc.perform(post("/items")
+        mockMvc.perform(MockMvcRequestBuilders.post("/items")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(incomeDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        verify(itemService, never()).create(any(), anyLong());
+        Mockito.verify(itemService, Mockito.never()).create(ArgumentMatchers.any(), ArgumentMatchers.anyLong());
     }
 
     @SneakyThrows
@@ -186,14 +185,14 @@ class ItemControllerTest {
                 .requestId(null)
                 .build();
 
-        when(itemService.update(any(), anyLong(), anyLong())).thenReturn(itemDto);
-        String content = mockMvc.perform(patch("/items/{itemId}", itemId)
+        Mockito.when(itemService.update(ArgumentMatchers.any(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(itemDto);
+        String content = mockMvc.perform(MockMvcRequestBuilders.patch("/items/{itemId}", itemId)
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(incomeDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -211,14 +210,14 @@ class ItemControllerTest {
                 .text("not bad")
                 .build();
 
-        when(itemService.addComment(any(), anyLong(), anyLong())).thenReturn(commentDto);
-        String content = mockMvc.perform(post("/items/{itemId}/comment", itemId)
+        Mockito.when(itemService.addComment(ArgumentMatchers.any(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(commentDto);
+        String content = mockMvc.perform(MockMvcRequestBuilders.post("/items/{itemId}/comment", itemId)
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(commentDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -231,21 +230,21 @@ class ItemControllerTest {
     void deleteById_correctUser_thenReturnOk() {
         long userId = 1L;
         long itemId = 1L;
-        mockMvc.perform(delete("/items/{itemId}", itemId)
+        mockMvc.perform(MockMvcRequestBuilders.delete("/items/{itemId}", itemId)
                         .header("X-Sharer-User-Id", userId))
-                .andDo(print())
-                .andExpect(status().isOk());
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        verify(itemService).deleteById(itemId, userId);
+        Mockito.verify(itemService).deleteById(itemId, userId);
     }
 
     @SneakyThrows
     @Test
     void deleteAll_thenReturnOk() {
-        mockMvc.perform(delete("/items"))
-                .andDo(print())
-                .andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.delete("/items"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        verify(itemService).deleteAll();
+        Mockito.verify(itemService).deleteAll();
     }
 }

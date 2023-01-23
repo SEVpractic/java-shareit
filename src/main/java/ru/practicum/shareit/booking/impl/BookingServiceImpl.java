@@ -26,6 +26,7 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
@@ -60,7 +61,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional
     public BookingDto getById(long id, long userId) {
         Booking booking = findById(id);
 
@@ -74,7 +74,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional
     public List<BookingDto> getAllByOwner(int from, int size, BookingState state, long userId) {
         List<Booking> bookings;
         findUserById(userId);
@@ -112,7 +111,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional
     public List<BookingDto> getAllByBooker(int from, int size, BookingState state, long userId) {
         List<Booking> bookings;
         findUserById(userId);

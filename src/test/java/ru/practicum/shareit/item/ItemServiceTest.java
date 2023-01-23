@@ -1,6 +1,7 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemIncomeDto;
@@ -20,7 +20,6 @@ import ru.practicum.shareit.util.exceptions.UpdateErrorException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RunWith(SpringRunner.class)
@@ -41,13 +40,13 @@ class ItemServiceTest {
                 .build();
         Optional<ItemDto> itemDto = Optional.of(itemService.create(incomeDto, 1L));
 
-        assertThat(itemDto)
+        Assertions.assertThat(itemDto)
                 .isPresent()
                 .hasValueSatisfying(i -> {
-                    assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
-                    assertThat(i).hasFieldOrPropertyWithValue("name", "item");
-                    assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 item");
-                    assertThat(i).hasFieldOrPropertyWithValue("available", false);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("name", "item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("available", false);
                 });
     }
 
@@ -59,13 +58,13 @@ class ItemServiceTest {
                 .build();
         Optional<ItemDto> itemDto = Optional.of(itemService.update(incomeDto, 1L, 1L));
 
-        assertThat(itemDto)
+        Assertions.assertThat(itemDto)
                 .isPresent()
                 .hasValueSatisfying(i -> {
-                    assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
-                    assertThat(i).hasFieldOrPropertyWithValue("name", "item");
-                    assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 item");
-                    assertThat(i).hasFieldOrPropertyWithValue("available", true);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("name", "item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("available", true);
                 });
     }
 
@@ -77,13 +76,13 @@ class ItemServiceTest {
                 .build();
         Optional<ItemDto> itemDto = Optional.of(itemService.update(incomeDto, 1L, 1L));
 
-        assertThat(itemDto)
+        Assertions.assertThat(itemDto)
                 .isPresent()
                 .hasValueSatisfying(i -> {
-                    assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
-                    assertThat(i).hasFieldOrPropertyWithValue("name", "item");
-                    assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 updated item");
-                    assertThat(i).hasFieldOrPropertyWithValue("available", true);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("name", "item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 updated item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("available", true);
                 });
     }
 
@@ -95,13 +94,13 @@ class ItemServiceTest {
                 .build();
         Optional<ItemDto> itemDto = Optional.of(itemService.update(incomeDto, 1L, 1L));
 
-        assertThat(itemDto)
+        Assertions.assertThat(itemDto)
                 .isPresent()
                 .hasValueSatisfying(i -> {
-                    assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
-                    assertThat(i).hasFieldOrPropertyWithValue("name", "updated item");
-                    assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 updated item");
-                    assertThat(i).hasFieldOrPropertyWithValue("available", true);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("name", "updated item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 updated item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("available", true);
                 });
     }
 
@@ -117,7 +116,7 @@ class ItemServiceTest {
         UpdateErrorException exception = assertThrows(UpdateErrorException.class,
                 () -> itemService.update(incomeDto, 1L, 2L));
 
-        assertThat(exception)
+        Assertions.assertThat(exception)
                 .hasMessage("Ошибка обновления вещи c id = 1 , невозможно обновить вещь другого пользователя");
     }
 
@@ -143,12 +142,12 @@ class ItemServiceTest {
                 .build();
         Optional<CommentDto> commentDto = Optional.of(itemService.addComment(incomeCommentDto, 1L, 2L));
 
-        assertThat(commentDto)
+        Assertions.assertThat(commentDto)
                 .isPresent()
                 .hasValueSatisfying(i -> {
-                    assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
-                    assertThat(i).hasFieldOrPropertyWithValue("text", "text 1 comment");
-                    assertThat(i).hasFieldOrPropertyWithValue("authorName", "name1");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("text", "text 1 comment");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("authorName", "name1");
                 });
     }
 
@@ -163,19 +162,19 @@ class ItemServiceTest {
     void getByIdForOwnerTest() {
         Optional<ItemDto> itemDto = Optional.of(itemService.getById(1L, 1L));
 
-        assertThat(itemDto)
+        Assertions.assertThat(itemDto)
                 .isPresent()
                 .hasValueSatisfying(i -> {
-                    assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
-                    assertThat(i).hasFieldOrPropertyWithValue("name", "updated item");
-                    assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 updated item");
-                    assertThat(i).hasFieldOrPropertyWithValue("available", true);
-                    assertThat(i).hasFieldOrProperty("lastBooking");
-                    assertThat(i.getLastBooking()).hasFieldOrPropertyWithValue("bookerId", 2L);
-                    assertThat(i).hasFieldOrProperty("nextBooking");
-                    assertThat(i.getNextBooking()).isNull();
-                    assertThat(i).hasFieldOrProperty("comments");
-                    assertThat(i.getComments()).hasSize(1);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("name", "updated item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 updated item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("available", true);
+                    Assertions.assertThat(i).hasFieldOrProperty("lastBooking");
+                    Assertions.assertThat(i.getLastBooking()).hasFieldOrPropertyWithValue("bookerId", 2L);
+                    Assertions.assertThat(i).hasFieldOrProperty("nextBooking");
+                    Assertions.assertThat(i.getNextBooking()).isNull();
+                    Assertions.assertThat(i).hasFieldOrProperty("comments");
+                    Assertions.assertThat(i.getComments()).hasSize(1);
                 });
     }
 
@@ -184,16 +183,16 @@ class ItemServiceTest {
     void getByIdNotForOwnerTest() {
         Optional<ItemDto> itemDto = Optional.of(itemService.getById(1L, 3L));
 
-        assertThat(itemDto)
+        Assertions.assertThat(itemDto)
                 .isPresent()
                 .hasValueSatisfying(i -> {
-                    assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
-                    assertThat(i).hasFieldOrPropertyWithValue("name", "updated item");
-                    assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 updated item");
-                    assertThat(i).hasFieldOrPropertyWithValue("available", true);
-                    assertThat(i.getLastBooking()).isNull();
-                    assertThat(i).hasFieldOrProperty("comments");
-                    assertThat(i.getComments()).hasSize(1);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("id", 1L);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("name", "updated item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("description", "users 1 updated item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("available", true);
+                    Assertions.assertThat(i.getLastBooking()).isNull();
+                    Assertions.assertThat(i).hasFieldOrProperty("comments");
+                    Assertions.assertThat(i.getComments()).hasSize(1);
                 });
     }
 
@@ -201,11 +200,11 @@ class ItemServiceTest {
     @Order(10)
     void getAllByOwnerIdTest() {
         List<ItemDto> items = itemService.getAllByUserId(0, 10, 1L);
-        assertThat(items)
+        Assertions.assertThat(items)
                 .hasSize(1);
 
         items = itemService.getAllByUserId(0, 10, 3L);
-        assertThat(items)
+        Assertions.assertThat(items)
                 .isEmpty();
     }
 
@@ -214,10 +213,10 @@ class ItemServiceTest {
     void getAllByTextTest() {
         List<ItemDto> items = itemService.getAllByText(0, 10, "item");
 
-        assertThat(items)
+        Assertions.assertThat(items)
                 .hasSize(1);
 
-        assertThat(items.get(0))
+        Assertions.assertThat(items.get(0))
                 .hasFieldOrPropertyWithValue("id", 1L);
     }
 
@@ -227,16 +226,16 @@ class ItemServiceTest {
     void getAllByUserIdPaginationTest() {
         List<ItemDto> items = itemService.getAllByUserId(0, 10, 1L);
 
-        assertThat(items)
+        Assertions.assertThat(items)
                 .hasSize(6);
-        assertThat(items.get(0))
+        Assertions.assertThat(items.get(0))
                 .hasFieldOrPropertyWithValue("name", "updated item");
 
         items = itemService.getAllByUserId(3, 2, 1L);
 
-        assertThat(items)
+        Assertions.assertThat(items)
                 .hasSize(2);
-        assertThat(items.get(0))
+        Assertions.assertThat(items.get(0))
                 .hasFieldOrPropertyWithValue("name", "item2");
     }
 
@@ -246,7 +245,7 @@ class ItemServiceTest {
         itemService.deleteAll();
         List<ItemDto> items = itemService.getAllByUserId(0, 10, 1L);
 
-        assertThat(items)
+        Assertions.assertThat(items)
                 .isEmpty();
     }
 
@@ -262,14 +261,14 @@ class ItemServiceTest {
                 .build();
         Optional<ItemDto> itemDto = Optional.of(itemService.create(incomeDto, 3L));
 
-        assertThat(itemDto)
+        Assertions.assertThat(itemDto)
                 .isPresent()
                 .hasValueSatisfying(i -> {
-                    assertThat(i).hasFieldOrPropertyWithValue("id", 7L);
-                    assertThat(i).hasFieldOrPropertyWithValue("name", "item");
-                    assertThat(i).hasFieldOrPropertyWithValue("description", "users 3 item");
-                    assertThat(i).hasFieldOrPropertyWithValue("available", true);
-                    assertThat(i).hasFieldOrPropertyWithValue("requestId", 1L);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("id", 7L);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("name", "item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("description", "users 3 item");
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("available", true);
+                    Assertions.assertThat(i).hasFieldOrPropertyWithValue("requestId", 1L);
                 });
     }
 

@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
+@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
@@ -40,7 +41,6 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
 
     @Override
-    @Transactional
     public ItemDto getById(long itemId, long userId) {
         Item item = findById(itemId);
 
@@ -57,7 +57,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public List<ItemDto> getAllByUserId(int from, int size, long userId) {
         Pageable pageable = PageRequest.of(
                 from == 0 ? 0 : (from / size),
@@ -73,7 +72,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public List<ItemDto> getAllByText(int from, int size, String text) {
         if (text.isBlank()) return List.of();
         Pageable pageable = PageRequest.of(
@@ -143,6 +141,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public void deleteAll() {
         itemRepository.deleteAll();
         log.info("Удалены все вещи");
