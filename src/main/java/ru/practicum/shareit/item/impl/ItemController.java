@@ -13,6 +13,7 @@ import ru.practicum.shareit.util.validation.UpdateValidationGroup;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -29,13 +30,17 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getAllByUserId(@RequestHeader("X-Sharer-User-Id") @Positive long userId) {
-        return itemService.getAllByUserId(userId);
+    public List<ItemDto> getAllByUserId(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                        @RequestParam(defaultValue = "10") @Positive int size,
+                                        @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
+        return itemService.getAllByUserId(from, size, userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getAllByText(@RequestParam(name = "text") String text) {
-        return itemService.getAllByText(text);
+    public List<ItemDto> getAllByText(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                      @RequestParam(defaultValue = "10") @Positive int size,
+                                      @RequestParam(name = "text") String text) {
+        return itemService.getAllByText(from, size, text);
     }
 
     @PostMapping

@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -15,6 +17,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemIncomeDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.exceptions.CreationErrorException;
@@ -28,18 +32,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
+@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-
+    private final ItemRequestRepository requestRepository;
     private final BookingRepository bookingRepository;
-
-    @Override
-    public List<Item> getAll() {
-        log.info("Возвращен список всех вещей");
-        return itemRepository.findAll();
-    }
 
     @Override
     public ItemDto getById(long itemId, long userId) {
@@ -58,8 +57,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAllByUserId(long userId) {
-        List<Item> items = itemRepository.findAllByOwner_IdOrderById(userId);
+    public List<ItemDto> getAllByUserId(int from, int size, long userId) {
+        Pageable pageable = PageRequest.of(
+                from == 0 ? 0 : (from / size),
+                size
+        );
+
+        List<Item> items = itemRepository.findAllByOwner_IdOrderById(userId, pageable);
         Map<Item, List<Booking>> bookings = findNearestBookings(items);
         Map<Item, List<Comment>> comments = findComments(items);
 
@@ -68,11 +72,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAllByText(String text) {
+    public List<ItemDto> getAllByText(int from, int size, String text) {
         if (text.isBlank()) return List.of();
+        Pageable pageable = PageRequest.of(
+                from == 0 ? 0 : (from / size),
+                size
+        );
 
         text = text.trim().toLowerCase();
-        List<Item> items = itemRepository.findByText(text);
+        List<Item> items = itemRepository.findByText(text, pageable);
         Map<Item, List<Comment>> comments = findComments(items);
 
         log.info("Возвращен список всех вещей со словом \"{}\" в названии или описании", text);
@@ -86,9 +94,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto create(ItemIncomeDto itemDto, long userId) {
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(findUserById(userId));
+        if (itemDto.getRequestId() != null) {
+            item.setItemRequest(findItemRequestById(itemDto.getRequestId()));
+        }
 
         item = itemRepository.save(item);
         log.info("Создана вещь c id = {} ", item.getId());
@@ -107,12 +119,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public void deleteById(long itemId, long userId) {
-        itemRepository.deleteByIdAndOwnerId(itemId, userId);
+        itemRepository.deleteItemByIdAndOwner_Id(itemId, userId);
         log.info("Удалена вещь c id = {} ", itemId);
     }
 
     @Override
+    @Transactional
     public CommentDto addComment(CommentDto commentDto, long itemId, long userId) {
         checkItemBooking(itemId, userId);
 
@@ -127,6 +141,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public void deleteAll() {
         itemRepository.deleteAll();
         log.info("Удалены все вещи");
@@ -191,5 +206,12 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
+    }
+
+    private ItemRequest findItemRequestById(Long requestId) {
+        return requestRepository.findById(requestId)
+                .orElseThrow(
+                        () -> new EntityNotExistException(
+                                String.format("Запрос c id = %s не существует", requestId)));
     }
 }
