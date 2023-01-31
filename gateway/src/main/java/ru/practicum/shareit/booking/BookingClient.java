@@ -41,7 +41,7 @@ public class BookingClient extends BaseClient {
         Map<String, Object> parameters = Map.of("approved", approved);
 
         log.info("Обработка запроса подтверждения аренды c id = {} ", id);
-        return patch("/" + id +"?approved={approved}", userId, parameters, null);
+        return patch("/" + id + "?approved={approved}", userId, parameters, null);
     }
 
     public ResponseEntity<Object> getById(long id, long userId) {
