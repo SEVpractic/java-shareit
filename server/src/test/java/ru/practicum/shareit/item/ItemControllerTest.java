@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,6 +22,9 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 @WebMvcTest(controllers = ItemController.class)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -57,18 +59,6 @@ class ItemControllerTest {
         Mockito.verify(itemService, Mockito.never()).getById(itemId, userId);
     }
 
-    /*@SneakyThrows
-    @Test
-    void getAllByUserId_withoutPaginationParams_thenReturnOk() {
-        long userId = 1L;
-        mockMvc.perform(MockMvcRequestBuilders.get("/items")
-                        .header("X-Sharer-User-Id", userId))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        Mockito.verify(itemService).getAllByUserId(0, 10, userId);
-    }*/
-
     @SneakyThrows
     @Test
     void getAllByUserId_withPaginationParams_thenReturnOk() {
@@ -82,17 +72,6 @@ class ItemControllerTest {
 
         Mockito.verify(itemService).getAllByUserId(3, 2, userId);
     }
-
-    /*@SneakyThrows
-    @Test
-    void getAllByText_withoutPaginationParams_thenReturnOk() {
-        String text = "java forever";
-        mockMvc.perform(MockMvcRequestBuilders.get("/items/search?text={text}", text))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        Mockito.verify(itemService).getAllByText(0, 10, text);
-    }*/
 
     @SneakyThrows
     @Test
@@ -119,7 +98,7 @@ class ItemControllerTest {
                 .requestId(null)
                 .build();
 
-        Mockito.when(itemService.create(ArgumentMatchers.any(), ArgumentMatchers.anyLong())).thenReturn(itemDto);
+        Mockito.when(itemService.create(any(), anyLong())).thenReturn(itemDto);
         String content = mockMvc.perform(MockMvcRequestBuilders.post("/items")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -133,31 +112,6 @@ class ItemControllerTest {
 
         Assertions.assertEquals(objectMapper.writeValueAsString(itemDto), content);
     }
-
-    /*@SneakyThrows
-    @Test
-    void create_unCorrectItemDto_thenReturnOk() {
-        long userId = 1L;
-        ItemIncomeDto incomeDto = ItemIncomeDto.builder()
-                .name("")
-                .description("")
-                .available(false)
-                .requestId(null)
-                .build();
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/items")
-                        .header("X-Sharer-User-Id", userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(incomeDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Mockito.verify(itemService, Mockito.never()).create(ArgumentMatchers.any(), ArgumentMatchers.anyLong());
-    }*/
 
     @SneakyThrows
     @Test
@@ -185,7 +139,7 @@ class ItemControllerTest {
                 .requestId(null)
                 .build();
 
-        Mockito.when(itemService.update(ArgumentMatchers.any(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(itemDto);
+        Mockito.when(itemService.update(any(), anyLong(), anyLong())).thenReturn(itemDto);
         String content = mockMvc.perform(MockMvcRequestBuilders.patch("/items/{itemId}", itemId)
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -210,7 +164,7 @@ class ItemControllerTest {
                 .text("not bad")
                 .build();
 
-        Mockito.when(itemService.addComment(ArgumentMatchers.any(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(commentDto);
+        Mockito.when(itemService.addComment(any(), anyLong(), anyLong())).thenReturn(commentDto);
         String content = mockMvc.perform(MockMvcRequestBuilders.post("/items/{itemId}/comment", itemId)
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)

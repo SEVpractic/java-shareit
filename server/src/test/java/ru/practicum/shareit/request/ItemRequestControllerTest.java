@@ -46,32 +46,6 @@ class ItemRequestControllerTest {
         verify(requestService).getById(requestId, userId);
     }
 
-    /*@SneakyThrows
-    @Test
-    void getAll_withoutStateAndPagination_thenReturnOk() {
-        long userId = 1L;
-        mockMvc.perform(get("/requests/all")
-                        .header("X-Sharer-User-Id", userId))
-                .andDo(print())
-                .andExpect(status().isOk());
-
-        verify(requestService).getAll(0, 10, 1L);
-    }*/
-
-    /*@SneakyThrows
-    @Test
-    void getAll_notWalidPagination_thenReturnOk() {
-        long userId = 1L;
-        int from = -1;
-        int size = 0;
-        mockMvc.perform(get("/requests/all?from={from}&size={size}", from, size)
-                        .header("X-Sharer-User-Id", userId))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-
-        verify(requestService, never()).getAll(0, 10, 1L);
-    }*/
-
     @SneakyThrows
     @Test
     void getForOwner_allCorrect_thenReturnOk() {

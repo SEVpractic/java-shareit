@@ -47,18 +47,6 @@ class BookingControllerTest {
         verify(bookingService).getById(bookingId, userId);
     }
 
-    /*@SneakyThrows
-    @Test
-    void getAllByBooker_withoutStateAndPagination_thenReturnOk() {
-        long userId = 1L;
-        mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", userId))
-                .andDo(print())
-                .andExpect(status().isOk());
-
-        verify(bookingService).getAllByBooker(0, 10, BookingState.ALL, 1L);
-    }*/
-
     @SneakyThrows
     @Test
     void getAllByBooker_notWalidPagination_thenReturnOk() {
@@ -72,19 +60,6 @@ class BookingControllerTest {
 
         verify(bookingService, never()).getAllByBooker(0, 10, BookingState.ALL, 1L);
     }
-
-    /*@SneakyThrows
-    @Test
-    void getAllByOwner_WAITING_thenReturnBadRequest() {
-        long userId = 1L;
-        BookingState state = BookingState.WAITING;
-        mockMvc.perform(get("/bookings/owner?state={state}", state)
-                        .header("X-Sharer-User-Id", userId))
-                .andDo(print())
-                .andExpect(status().isOk());
-
-        verify(bookingService).getAllByOwner(0, 10, BookingState.WAITING, 1L);
-    }*/
 
     @SneakyThrows
     @Test
@@ -119,30 +94,6 @@ class BookingControllerTest {
         Assertions.assertEquals(objectMapper.writeValueAsString(bookingDto), content);
     }
 
-    /*@SneakyThrows
-    @Test
-    void create_StartAfterEnd_thenReturnBadRequest() {
-        long userId = 1L;
-        BookingIncomeDto bookingIncomeDto = BookingIncomeDto.builder()
-                .itemId(1L)
-                .start(LocalDateTime.now().plusHours(1))
-                .end(LocalDateTime.now().plusMinutes(30))
-                .build();
-
-        mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bookingIncomeDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        verify(bookingService, never()).create(any(), anyLong());
-    }*/
-
     @SneakyThrows
     @Test
     void confirm_allCorrect_thenReturnOk() {
@@ -156,16 +107,4 @@ class BookingControllerTest {
 
         verify(bookingService).confirm(bookingId, userId, approved);
     }
-
-    /*@SneakyThrows
-    @Test
-    void getAllByOwner_UNSUPPORTED_STATUS_thenReturnBadRequest() {
-        long userId = 1L;
-        String state = "abracadabra";
-        mockMvc.perform(get("/bookings/owner?state={state}", state)
-                        .header("X-Sharer-User-Id", userId))
-                .andDo(print());
-
-        verify(bookingService).getAllByOwner(0, 10, BookingState.UNSUPPORTED_STATUS, 1L);
-    }*/
 }

@@ -82,52 +82,6 @@ class UserControllerTest {
         Assertions.assertEquals(objectMapper.writeValueAsString(userDto), result);
     }
 
-    /*@SneakyThrows
-    @Test
-    void createTest_unCorrectUserEmail_thenReturnBadRequest() {
-        UserIncomeDto userIncomeDto = UserIncomeDto.builder()
-                .name("User")
-                .email("userYandexRu")
-                .build();
-
-        mockMvc.perform(
-                        post("/users")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(userIncomeDto))
-                                .characterEncoding(StandardCharsets.UTF_8)
-                                .accept(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        verify(userService, never()).create(any());
-    }*/
-
-    /*@SneakyThrows
-    @Test
-    void createTest_UnCorrectUserName_thenReturnBadRequest() {
-        UserIncomeDto userIncomeDto = UserIncomeDto.builder()
-                .name(null)
-                .email("user@yandex.ru")
-                .build();
-
-        mockMvc.perform(
-                        post("/users")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(userIncomeDto))
-                                .characterEncoding(StandardCharsets.UTF_8)
-                                .accept(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        verify(userService, never()).create(any());
-    }*/
-
     @SneakyThrows
     @Test
     void updateTest_correctUserIncomeDto_thenReturnOk() {
