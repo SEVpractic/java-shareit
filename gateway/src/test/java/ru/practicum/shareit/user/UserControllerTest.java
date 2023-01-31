@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserIncomeDto;
-import ru.practicum.shareit.user.impl.UserController;
 
 import javax.validation.ConstraintViolationException;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +29,7 @@ class UserControllerTest {
     private final ObjectMapper objectMapper;
     private final MockMvc mockMvc;
     @MockBean
-    private final UserService userService;
+    private final UserClient userClient;
 
     @SneakyThrows
     @Test
@@ -39,7 +39,7 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(userService).getById(userId);
+        verify(userClient).getById(userId);
     }
 
     @SneakyThrows
@@ -50,7 +50,7 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(userService).getAll();
+        verify(userClient).getAll();
     }
 
     @SneakyThrows
@@ -60,13 +60,15 @@ class UserControllerTest {
                 .name("User")
                 .email("user@yandex.ru")
                 .build();
-        UserDto userDto = UserDto.builder()
-                .id(1L)
-                .name("user")
-                .email("user@yandex.ru")
-                .build();
 
-        when(userService.create(any())).thenReturn(userDto);
+        String userJson = "{\n" +
+                "    \"id\": 1,\n" +
+                "    \"name\": \"user\",\n" +
+                "    \"email\": \"user@user.com\"\n" +
+                "}";
+        ResponseEntity<Object> response = new ResponseEntity<>(userJson, HttpStatus.OK);
+
+        when(userClient.create(any())).thenReturn(response);
         String result = mockMvc.perform(
                         post("/users")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -79,10 +81,10 @@ class UserControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        Assertions.assertEquals(objectMapper.writeValueAsString(userDto), result);
+        Assertions.assertEquals(userJson, result);
     }
 
-    /*@SneakyThrows
+    @SneakyThrows
     @Test
     void createTest_unCorrectUserEmail_thenReturnBadRequest() {
         UserIncomeDto userIncomeDto = UserIncomeDto.builder()
@@ -102,10 +104,10 @@ class UserControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        verify(userService, never()).create(any());
-    }*/
+        verify(userClient, never()).create(any());
+    }
 
-    /*@SneakyThrows
+    @SneakyThrows
     @Test
     void createTest_UnCorrectUserName_thenReturnBadRequest() {
         UserIncomeDto userIncomeDto = UserIncomeDto.builder()
@@ -125,8 +127,8 @@ class UserControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        verify(userService, never()).create(any());
-    }*/
+        verify(userClient, never()).create(any());
+    }
 
     @SneakyThrows
     @Test
@@ -135,13 +137,15 @@ class UserControllerTest {
                 .name("User")
                 .email("user@yandex.ru")
                 .build();
-        UserDto userDto = UserDto.builder()
-                .id(1L)
-                .name("UserUpdate")
-                .email("user@yandex.ru")
-                .build();
 
-        when(userService.update(any(), anyLong())).thenReturn(userDto);
+        String userJson = "{\n" +
+                "    \"id\": 1,\n" +
+                "    \"name\": \"UserUpdate\",\n" +
+                "    \"email\": \"user@yandex.ru\"\n" +
+                "}";
+        ResponseEntity<Object> response = new ResponseEntity<>(userJson, HttpStatus.OK);
+
+        when(userClient.update(any(), anyLong())).thenReturn(response);
         String result = mockMvc.perform(
                         patch("/users/{userId}", 1L)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -154,7 +158,7 @@ class UserControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        Assertions.assertEquals(objectMapper.writeValueAsString(userDto), result);
+        Assertions.assertEquals(userJson, result);
     }
 
     @SneakyThrows
@@ -165,7 +169,7 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(userService).deleteById(userId);
+        verify(userClient).deleteById(userId);
     }
 
     @SneakyThrows
@@ -175,7 +179,7 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(userService).deleteAll();
+        verify(userClient).deleteAll();
     }
 
     @SneakyThrows
@@ -186,7 +190,7 @@ class UserControllerTest {
                 .email("user@yandex.ru")
                 .build();
 
-        when(userService.create(any())).thenThrow(ConstraintViolationException.class);
+        when(userClient.create(any())).thenThrow(ConstraintViolationException.class);
         mockMvc.perform(
                         post("/users")
                                 .contentType(MediaType.APPLICATION_JSON)

@@ -8,13 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingIncomeDto;
-import ru.practicum.shareit.booking.impl.BookingController;
-import ru.practicum.shareit.booking.model.BookingState;
-import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.dto.BookingState;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -32,7 +31,7 @@ class BookingControllerTest {
     private final ObjectMapper objectMapper;
     private final MockMvc mockMvc;
     @MockBean
-    private BookingService bookingService;
+    private BookingClient bookingClient;
 
     @SneakyThrows
     @Test
@@ -44,10 +43,10 @@ class BookingControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(bookingService).getById(bookingId, userId);
+        verify(bookingClient).getById(bookingId, userId);
     }
 
-    /*@SneakyThrows
+    @SneakyThrows
     @Test
     void getAllByBooker_withoutStateAndPagination_thenReturnOk() {
         long userId = 1L;
@@ -56,8 +55,8 @@ class BookingControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(bookingService).getAllByBooker(0, 10, BookingState.ALL, 1L);
-    }*/
+        verify(bookingClient).getAllByBooker(0, 10, BookingState.ALL, 1L);
+    }
 
     @SneakyThrows
     @Test
@@ -70,10 +69,10 @@ class BookingControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
-        verify(bookingService, never()).getAllByBooker(0, 10, BookingState.ALL, 1L);
+        verify(bookingClient, never()).getAllByBooker(0, 10, BookingState.ALL, 1L);
     }
 
-    /*@SneakyThrows
+    @SneakyThrows
     @Test
     void getAllByOwner_WAITING_thenReturnBadRequest() {
         long userId = 1L;
@@ -83,8 +82,8 @@ class BookingControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(bookingService).getAllByOwner(0, 10, BookingState.WAITING, 1L);
-    }*/
+        verify(bookingClient).getAllByOwner(0, 10, BookingState.WAITING, 1L);
+    }
 
     @SneakyThrows
     @Test
@@ -95,16 +94,23 @@ class BookingControllerTest {
                 .start(LocalDateTime.now().plusHours(1))
                 .end(LocalDateTime.now().plusHours(2))
                 .build();
-        BookingDto bookingDto = BookingDto.builder()
-                .id(1L)
-                .start(LocalDateTime.now().plusHours(1))
-                .end(LocalDateTime.now().plusHours(2))
-                .booker(new BookingDto.ShortBookerDto(1L, "user"))
-                .item(new BookingDto.ShortItemDto(1L, "item"))
-                .status(BookingStatus.WAITING)
-                .build();
+        String bookingJson = "{\n" +
+                "    \"id\": 1,\n" +
+                "    \"start\": \"" + LocalDateTime.now().plusHours(1) + "\",\n" +
+                "    \"end\": \"" + LocalDateTime.now().plusHours(2) + "\",\n" +
+                "    \"item\": {\n" +
+                "        \"id\": 1,\n" +
+                "        \"name\": \"item\"\n" +
+                "    },\n" +
+                "    \"booker\": {\n" +
+                "        \"id\": 1,\n" +
+                "        \"name\": \"user\"\n" +
+                "    },\n" +
+                "    \"status\": \"WAITING\"\n" +
+                "}";
+        ResponseEntity<Object> response = new ResponseEntity<>(bookingJson, HttpStatus.OK);
 
-        when(bookingService.create(any(), anyLong())).thenReturn(bookingDto);
+        when(bookingClient.create(any(), anyLong())).thenReturn(response);
         String content = mockMvc.perform(post("/bookings")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -116,10 +122,10 @@ class BookingControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        Assertions.assertEquals(objectMapper.writeValueAsString(bookingDto), content);
+        Assertions.assertEquals(bookingJson, content);
     }
 
-    /*@SneakyThrows
+    @SneakyThrows
     @Test
     void create_StartAfterEnd_thenReturnBadRequest() {
         long userId = 1L;
@@ -140,8 +146,8 @@ class BookingControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        verify(bookingService, never()).create(any(), anyLong());
-    }*/
+        verify(bookingClient, never()).create(any(), anyLong());
+    }
 
     @SneakyThrows
     @Test
@@ -154,10 +160,10 @@ class BookingControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(bookingService).confirm(bookingId, userId, approved);
+        verify(bookingClient).confirm(bookingId, userId, approved);
     }
 
-    /*@SneakyThrows
+    @SneakyThrows
     @Test
     void getAllByOwner_UNSUPPORTED_STATUS_thenReturnBadRequest() {
         long userId = 1L;
@@ -166,6 +172,32 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", userId))
                 .andDo(print());
 
-        verify(bookingService).getAllByOwner(0, 10, BookingState.UNSUPPORTED_STATUS, 1L);
-    }*/
+        verify(bookingClient).getAllByOwner(0, 10, BookingState.UNSUPPORTED_STATUS, 1L);
+    }
+
+    @SneakyThrows
+    @Test
+    void getAllByOwner_unsupported_thenReturnBadRequest() {
+        long userId = 1L;
+        String state = "blablabla";
+        mockMvc.perform(get("/bookings/owner?state={state}", state)
+                        .header("X-Sharer-User-Id", userId))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(bookingClient, never()).getAllByBooker(0, 10, BookingState.ALL, 1L);
+    }
+
+    @SneakyThrows
+    @Test
+    void getAllByBooker_unsupported_calRejectedQuery() {
+        long userId = 1L;
+        String state = "blablabla";
+        mockMvc.perform(get("/bookings?state={state}", state)
+                        .header("X-Sharer-User-Id", userId))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(bookingClient, never()).getAllByBooker(0, 10, BookingState.ALL, 1L);
+    }
 }

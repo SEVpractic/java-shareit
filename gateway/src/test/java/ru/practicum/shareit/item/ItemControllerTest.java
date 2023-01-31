@@ -5,24 +5,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemIncomeDto;
-import ru.practicum.shareit.item.impl.ItemController;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 @WebMvcTest(controllers = ItemController.class)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -30,7 +30,7 @@ class ItemControllerTest {
     private final ObjectMapper objectMapper;
     private final MockMvc mockMvc;
     @MockBean
-    private final ItemService itemService;
+    private final ItemClient itemClient;
 
     @SneakyThrows
     @Test
@@ -42,7 +42,7 @@ class ItemControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(itemService).getById(itemId, userId);
+        Mockito.verify(itemClient).getById(itemId, userId);
     }
 
     @SneakyThrows
@@ -54,10 +54,10 @@ class ItemControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
-        Mockito.verify(itemService, Mockito.never()).getById(itemId, userId);
+        Mockito.verify(itemClient, Mockito.never()).getById(itemId, userId);
     }
 
-    /*@SneakyThrows
+    @SneakyThrows
     @Test
     void getAllByUserId_withoutPaginationParams_thenReturnOk() {
         long userId = 1L;
@@ -66,8 +66,8 @@ class ItemControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(itemService).getAllByUserId(0, 10, userId);
-    }*/
+        Mockito.verify(itemClient).getAllByUserId(0, 10, userId);
+    }
 
     @SneakyThrows
     @Test
@@ -80,10 +80,10 @@ class ItemControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(itemService).getAllByUserId(3, 2, userId);
+        Mockito.verify(itemClient).getAllByUserId(3, 2, userId);
     }
 
-    /*@SneakyThrows
+    @SneakyThrows
     @Test
     void getAllByText_withoutPaginationParams_thenReturnOk() {
         String text = "java forever";
@@ -91,8 +91,8 @@ class ItemControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(itemService).getAllByText(0, 10, text);
-    }*/
+        Mockito.verify(itemClient).getAllByText(0, 10, text);
+    }
 
     @SneakyThrows
     @Test
@@ -104,22 +104,25 @@ class ItemControllerTest {
                 .available(false)
                 .requestId(null)
                 .build();
-        ItemDto itemDto = ItemDto.builder()
-                .name("item")
-                .description("item description")
-                .available(false)
-                .owner(UserDto.builder()
-                        .id(1L)
-                        .name("user")
-                        .email("user@yandex.ru")
-                        .build())
-                .nextBooking(null)
-                .lastBooking(null)
-                .comments(List.of())
-                .requestId(null)
-                .build();
 
-        Mockito.when(itemService.create(ArgumentMatchers.any(), ArgumentMatchers.anyLong())).thenReturn(itemDto);
+        String itemJson = "{\n" +
+                "    \"id\": 1,\n" +
+                "    \"name\": \"item\",\n" +
+                "    \"description\": \"item description\",\n" +
+                "    \"available\": false),\n" +
+                "    \"owner\": {\n" +
+                "        \"id\": 1,\n" +
+                "        \"name\": \"user\",\n" +
+                "        \"email\": \"user@yandex.ru\"\n" +
+                "    },\n" +
+                "    \"lastBooking\": null,\n" +
+                "    \"nextBooking\": null,\n" +
+                "    \"comments\": [],\n" +
+                "    \"requestId\": null\n" +
+                "}";
+        ResponseEntity<Object> response = new ResponseEntity<>(itemJson, HttpStatus.OK);
+
+        Mockito.when(itemClient.create(any(), anyLong())).thenReturn(response);
         String content = mockMvc.perform(MockMvcRequestBuilders.post("/items")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -131,10 +134,10 @@ class ItemControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        Assertions.assertEquals(objectMapper.writeValueAsString(itemDto), content);
+        Assertions.assertEquals(itemJson, content);
     }
 
-    /*@SneakyThrows
+    @SneakyThrows
     @Test
     void create_unCorrectItemDto_thenReturnOk() {
         long userId = 1L;
@@ -156,8 +159,8 @@ class ItemControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        Mockito.verify(itemService, Mockito.never()).create(ArgumentMatchers.any(), ArgumentMatchers.anyLong());
-    }*/
+        Mockito.verify(itemClient, Mockito.never()).create(any(), anyLong());
+    }
 
     @SneakyThrows
     @Test
@@ -170,22 +173,25 @@ class ItemControllerTest {
                 .available(true)
                 .requestId(null)
                 .build();
-        ItemDto itemDto = ItemDto.builder()
-                .name("item")
-                .description("item description")
-                .available(true)
-                .owner(UserDto.builder()
-                        .id(1L)
-                        .name("user")
-                        .email("user@yandex.ru")
-                        .build())
-                .nextBooking(null)
-                .lastBooking(null)
-                .comments(List.of())
-                .requestId(null)
-                .build();
 
-        Mockito.when(itemService.update(ArgumentMatchers.any(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(itemDto);
+        String itemJson = "{\n" +
+                "    \"id\": 1,\n" +
+                "    \"name\": \"item\",\n" +
+                "    \"description\": \"item description\",\n" +
+                "    \"available\": false),\n" +
+                "    \"owner\": {\n" +
+                "        \"id\": 1,\n" +
+                "        \"name\": \"user\",\n" +
+                "        \"email\": \"user@yandex.ru\"\n" +
+                "    },\n" +
+                "    \"lastBooking\": null,\n" +
+                "    \"nextBooking\": null,\n" +
+                "    \"comments\": [],\n" +
+                "    \"requestId\": null\n" +
+                "}";
+        ResponseEntity<Object> response = new ResponseEntity<>(itemJson, HttpStatus.OK);
+
+        Mockito.when(itemClient.update(any(), anyLong(), anyLong())).thenReturn(response);
         String content = mockMvc.perform(MockMvcRequestBuilders.patch("/items/{itemId}", itemId)
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -197,7 +203,7 @@ class ItemControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        Assertions.assertEquals(objectMapper.writeValueAsString(itemDto), content);
+        Assertions.assertEquals(itemJson, content);
     }
 
     @SneakyThrows
@@ -209,8 +215,14 @@ class ItemControllerTest {
                 .authorName("user")
                 .text("not bad")
                 .build();
+        String commentJson = "{\n" +
+                "    \"id\": 1,\n" +
+                "    \"text\": \"not bad\",\n" +
+                "    \"authorName\": \"user\"\n" +
+                "}";
+        ResponseEntity<Object> response = new ResponseEntity<>(commentJson, HttpStatus.OK);
 
-        Mockito.when(itemService.addComment(ArgumentMatchers.any(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(commentDto);
+        Mockito.when(itemClient.addComment(any(), anyLong(), anyLong())).thenReturn(response);
         String content = mockMvc.perform(MockMvcRequestBuilders.post("/items/{itemId}/comment", itemId)
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -222,7 +234,7 @@ class ItemControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        Assertions.assertEquals(objectMapper.writeValueAsString(commentDto), content);
+        Assertions.assertEquals(commentJson, content);
     }
 
     @SneakyThrows
@@ -235,7 +247,7 @@ class ItemControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(itemService).deleteById(itemId, userId);
+        Mockito.verify(itemClient).deleteById(itemId, userId);
     }
 
     @SneakyThrows
@@ -245,6 +257,6 @@ class ItemControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(itemService).deleteAll();
+        Mockito.verify(itemClient).deleteAll();
     }
 }

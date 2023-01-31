@@ -152,17 +152,6 @@ class BookingMockServiceTest {
     }
 
     @Test
-    void getAllByOwner_unsupported_calRejectedQuery() {
-        when(userRepository.findById(anyLong()))
-                .thenReturn(Optional.of(new User()));
-
-        assertThrows(UnsupportedStatusException.class,
-                () -> bookingService.getAllByOwner(
-                        0, 10, BookingState.UNSUPPORTED_STATUS, 1
-                ));
-    }
-
-    @Test
     void getAllByBooker_allState_callAllQuery() {
         long userId = 1L;
         int from = 0;
@@ -280,16 +269,5 @@ class BookingMockServiceTest {
         bookingService.getAllByBooker(from, size, BookingState.REJECTED, userId);
 
         verify(bookingRepository).findAllRejectedByBooker(userId, pageable);
-    }
-
-    @Test
-    void getAllByBooker_unsupported_calRejectedQuery() {
-        when(userRepository.findById(anyLong()))
-                .thenReturn(Optional.of(new User()));
-
-        assertThrows(UnsupportedStatusException.class,
-                () -> bookingService.getAllByBooker(
-                        0, 10, BookingState.UNSUPPORTED_STATUS, 1
-                ));
     }
 }

@@ -8,14 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestIncomeDto;
-import ru.practicum.shareit.request.impl.ItemRequestController;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -25,13 +24,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = ItemRequestController.class)
+@WebMvcTest(controllers = RequestController.class)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemRequestControllerTest {
     private final ObjectMapper objectMapper;
     private final MockMvc mockMvc;
     @MockBean
-    RequestService requestService;
+    RequestClient requestClient;
 
     @SneakyThrows
     @Test
@@ -43,10 +42,10 @@ class ItemRequestControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(requestService).getById(requestId, userId);
+        verify(requestClient).getById(requestId, userId);
     }
 
-    /*@SneakyThrows
+    @SneakyThrows
     @Test
     void getAll_withoutStateAndPagination_thenReturnOk() {
         long userId = 1L;
@@ -55,10 +54,10 @@ class ItemRequestControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(requestService).getAll(0, 10, 1L);
-    }*/
+        verify(requestClient).getAll(0, 10, 1L);
+    }
 
-    /*@SneakyThrows
+    @SneakyThrows
     @Test
     void getAll_notWalidPagination_thenReturnOk() {
         long userId = 1L;
@@ -69,8 +68,8 @@ class ItemRequestControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
-        verify(requestService, never()).getAll(0, 10, 1L);
-    }*/
+        verify(requestClient, never()).getAll(0, 10, 1L);
+    }
 
     @SneakyThrows
     @Test
@@ -81,7 +80,7 @@ class ItemRequestControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(requestService).getForOwner(userId);
+        verify(requestClient).getForOwner(userId);
     }
 
     @SneakyThrows
@@ -91,14 +90,18 @@ class ItemRequestControllerTest {
         ItemRequestIncomeDto incomeDto = ItemRequestIncomeDto.builder()
                 .description("text")
                 .build();
-        ItemRequestDto itemRequestDto = ItemRequestDto.builder()
-                .id(1L)
-                .description("text")
-                .created(LocalDateTime.now())
-                .requestor(new ItemRequestDto.ShortRequestorDto(1L, "user"))
-                .build();
+        String requestJson = "{\n" +
+                "    \"id\": 1,\n" +
+                "    \"description\": \"text\",\n" +
+                "    \"created\": \"2023-01-31T18:33:58.7484292\",\n" +
+                "    \"requestor\": {\n" +
+                "        \"id\": 1,\n" +
+                "        \"name\": \"user\"\n" +
+                "    }\n" +
+                "}";
+        ResponseEntity<Object> response = new ResponseEntity<>(requestJson, HttpStatus.OK);
 
-        when(requestService.create(any(), anyLong())).thenReturn(itemRequestDto);
+        when(requestClient.create(any(), anyLong())).thenReturn(response);
         String content = mockMvc.perform(post("/requests")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -110,6 +113,6 @@ class ItemRequestControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        Assertions.assertEquals(objectMapper.writeValueAsString(itemRequestDto), content);
+        Assertions.assertEquals(requestJson, content);
     }
 }
