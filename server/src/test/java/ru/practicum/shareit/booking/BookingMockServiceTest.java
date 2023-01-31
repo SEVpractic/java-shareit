@@ -13,11 +13,9 @@ import ru.practicum.shareit.booking.impl.BookingServiceImpl;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.util.exceptions.UnsupportedStatusException;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
