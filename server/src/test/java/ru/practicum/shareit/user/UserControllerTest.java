@@ -13,8 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserIncomeDto;
 import ru.practicum.shareit.user.impl.UserController;
+import ru.practicum.shareit.util.exceptions.CreationErrorException;
 
-import javax.validation.ConstraintViolationException;
 import java.nio.charset.StandardCharsets;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -140,7 +140,7 @@ class UserControllerTest {
                 .email("user@yandex.ru")
                 .build();
 
-        when(userService.create(any())).thenThrow(ConstraintViolationException.class);
+        when(userService.create(any())).thenThrow(CreationErrorException.class);
         mockMvc.perform(
                         post("/users")
                                 .contentType(MediaType.APPLICATION_JSON)

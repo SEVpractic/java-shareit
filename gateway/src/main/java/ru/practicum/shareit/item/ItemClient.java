@@ -12,6 +12,7 @@ import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemIncomeDto;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -45,6 +46,8 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAllByText(int from, int size, String text) {
+        if (text.isBlank()) return ResponseEntity.ok().body(List.of());
+
         Map<String, Object> parameters = Map.of(
                 "from", from,
                 "size", size,
@@ -70,13 +73,13 @@ public class ItemClient extends BaseClient {
         return patch("/" + itemId, userId, itemDto);
     }
 
-    public void deleteById(long itemId, long userId) {
+    public ResponseEntity<Object> deleteById(long itemId, long userId) {
         log.info("Обработка запроса на удаление вещи c id = {} ", itemId);
-        delete("/" + itemId, userId);
+        return delete("/" + itemId, userId);
     }
 
-    public void deleteAll() {
+    public ResponseEntity<Object> deleteAll() {
         log.info("Обработка запроса на удаление всех вещей");
-        delete("");
+        return delete("");
     }
 }

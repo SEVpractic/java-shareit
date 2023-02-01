@@ -4,6 +4,7 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserIncomeDto;
@@ -12,7 +13,7 @@ import ru.practicum.shareit.util.validation.UpdateValidationGroup;
 
 import javax.validation.constraints.Positive;
 
-@RestController
+@Controller
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Validated
@@ -41,12 +42,12 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteById(@PathVariable("userId") @Positive long userId) {
-        userClient.deleteById(userId);
+    public ResponseEntity<Object> deleteById(@PathVariable("userId") @Positive long userId) {
+        return userClient.deleteById(userId);
     }
 
     @DeleteMapping
-    public void deleteAll() {
-        userClient.deleteAll();
+    public ResponseEntity<Object> deleteAll() {
+        return userClient.deleteAll();
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.user.dto.UserIncomeDto;
+import ru.practicum.shareit.util.UserDto;
 
 import javax.validation.ConstraintViolationException;
 import java.nio.charset.StandardCharsets;
@@ -61,11 +62,13 @@ class UserControllerTest {
                 .email("user@yandex.ru")
                 .build();
 
-        String userJson = "{\n" +
-                "    \"id\": 1,\n" +
-                "    \"name\": \"user\",\n" +
-                "    \"email\": \"user@user.com\"\n" +
-                "}";
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .name("user")
+                .email("user@yandex.ru")
+                .build();
+        String userJson = objectMapper.writeValueAsString(userDto);
+
         ResponseEntity<Object> response = new ResponseEntity<>(userJson, HttpStatus.OK);
 
         when(userClient.create(any())).thenReturn(response);
@@ -138,11 +141,13 @@ class UserControllerTest {
                 .email("user@yandex.ru")
                 .build();
 
-        String userJson = "{\n" +
-                "    \"id\": 1,\n" +
-                "    \"name\": \"UserUpdate\",\n" +
-                "    \"email\": \"user@yandex.ru\"\n" +
-                "}";
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .name("user")
+                .email("user@yandex.ru")
+                .build();
+        String userJson = objectMapper.writeValueAsString(userDto);
+
         ResponseEntity<Object> response = new ResponseEntity<>(userJson, HttpStatus.OK);
 
         when(userClient.update(any(), anyLong())).thenReturn(response);

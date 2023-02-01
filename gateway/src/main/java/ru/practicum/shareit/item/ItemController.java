@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -14,7 +15,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
-@RestController
+@Controller
 @RequestMapping("/items")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Validated
@@ -43,32 +44,32 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<Object> create(@Validated(CreateValidationGroup.class) @RequestBody ItemIncomeDto itemDto,
-                          @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
+                                         @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
         return itemClient.create(itemDto, userId);
     }
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> addComment(@PathVariable("itemId") @Positive long itemId,
-                                 @RequestHeader("X-Sharer-User-Id") @Positive long userId,
-                                 @Valid @RequestBody CommentDto commentDto) {
+                                             @RequestHeader("X-Sharer-User-Id") @Positive long userId,
+                                             @Valid @RequestBody CommentDto commentDto) {
         return itemClient.addComment(commentDto, itemId, userId);
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<Object> update(@PathVariable("itemId") @Positive long itemId,
-                          @RequestHeader("X-Sharer-User-Id") @Positive long userId,
-                          @Validated(UpdateValidationGroup.class) @RequestBody ItemIncomeDto itemDto) {
+                                         @RequestHeader("X-Sharer-User-Id") @Positive long userId,
+                                         @Validated(UpdateValidationGroup.class) @RequestBody ItemIncomeDto itemDto) {
         return itemClient.update(itemDto, itemId, userId);
     }
 
     @DeleteMapping("/{itemId}")
-    public void deleteById(@PathVariable("itemId") @Positive long itemId,
+    public ResponseEntity<Object> deleteById(@PathVariable("itemId") @Positive long itemId,
                            @RequestHeader("X-Sharer-User-Id") @Positive long userId) {
-        itemClient.deleteById(itemId, userId);
+        return itemClient.deleteById(itemId, userId);
     }
 
     @DeleteMapping
-    public void deleteAll() {
-        itemClient.deleteAll();
+    public ResponseEntity<Object> deleteAll() {
+        return itemClient.deleteAll();
     }
 }

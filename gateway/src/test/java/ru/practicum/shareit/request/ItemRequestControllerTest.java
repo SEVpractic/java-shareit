@@ -13,8 +13,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.request.dto.ItemRequestIncomeDto;
+import ru.practicum.shareit.util.ItemRequestDto;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -90,15 +92,14 @@ class ItemRequestControllerTest {
         ItemRequestIncomeDto incomeDto = ItemRequestIncomeDto.builder()
                 .description("text")
                 .build();
-        String requestJson = "{\n" +
-                "    \"id\": 1,\n" +
-                "    \"description\": \"text\",\n" +
-                "    \"created\": \"2023-01-31T18:33:58.7484292\",\n" +
-                "    \"requestor\": {\n" +
-                "        \"id\": 1,\n" +
-                "        \"name\": \"user\"\n" +
-                "    }\n" +
-                "}";
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder()
+                .id(1L)
+                .description("text")
+                .created(LocalDateTime.now().plusHours(1))
+                .requestor(new ItemRequestDto.ShortRequestorDto(1L, "user"))
+                .build();
+        String requestJson = objectMapper.writeValueAsString(itemRequestDto);
+
         ResponseEntity<Object> response = new ResponseEntity<>(requestJson, HttpStatus.OK);
 
         when(requestClient.create(any(), anyLong())).thenReturn(response);

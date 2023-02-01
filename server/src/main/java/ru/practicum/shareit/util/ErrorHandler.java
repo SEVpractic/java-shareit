@@ -16,8 +16,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.practicum.shareit.util.exceptions.*;
 
-import javax.validation.ConstraintViolationException;
-
 @RestControllerAdvice
 @Slf4j
 public class ErrorHandler extends ResponseEntityExceptionHandler {
@@ -73,12 +71,6 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> handleThrowableException(Throwable ex) {
         log.info("500 {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler
-    private ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
-        log.info("400 {}", ex.getMessage());
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler

@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingIncomeDto;
 import ru.practicum.shareit.booking.dto.BookingState;
+import ru.practicum.shareit.util.BookingDto;
+import ru.practicum.shareit.util.BookingStatus;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -94,20 +96,16 @@ class BookingControllerTest {
                 .start(LocalDateTime.now().plusHours(1))
                 .end(LocalDateTime.now().plusHours(2))
                 .build();
-        String bookingJson = "{\n" +
-                "    \"id\": 1,\n" +
-                "    \"start\": \"" + LocalDateTime.now().plusHours(1) + "\",\n" +
-                "    \"end\": \"" + LocalDateTime.now().plusHours(2) + "\",\n" +
-                "    \"item\": {\n" +
-                "        \"id\": 1,\n" +
-                "        \"name\": \"item\"\n" +
-                "    },\n" +
-                "    \"booker\": {\n" +
-                "        \"id\": 1,\n" +
-                "        \"name\": \"user\"\n" +
-                "    },\n" +
-                "    \"status\": \"WAITING\"\n" +
-                "}";
+        BookingDto bookingDto = BookingDto.builder()
+                .id(1L)
+                .start(LocalDateTime.now().plusHours(1))
+                .end(LocalDateTime.now().plusHours(2))
+                .booker(new BookingDto.ShortBookerDto(1L, "user"))
+                .item(new BookingDto.ShortItemDto(1L, "item"))
+                .status(BookingStatus.WAITING)
+                .build();
+        String bookingJson = objectMapper.writeValueAsString(bookingDto);
+
         ResponseEntity<Object> response = new ResponseEntity<>(bookingJson, HttpStatus.OK);
 
         when(bookingClient.create(any(), anyLong())).thenReturn(response);

@@ -46,13 +46,13 @@ public class UserClient extends BaseClient {
         return patch("/" + userId, userDto);
     }
 
-    public void deleteById(long userId) {
+    public ResponseEntity<Object> deleteById(long userId) {
         log.info("Обработка запроса на удаление пользователя c id = {} ", userId);
-        delete("/" + userId);
+        return delete("/" + userId);
     }
 
-    public void deleteAll() {
+    public ResponseEntity<Object> deleteAll() {
         log.info("Обработка запроса на удаление всех пользователей");
-        delete("");
+        return delete("");
     }
 }

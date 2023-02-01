@@ -18,11 +18,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemIncomeDto;
+import ru.practicum.shareit.util.ItemDto;
+import ru.practicum.shareit.util.UserDto;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
 @WebMvcTest(controllers = ItemController.class)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -105,21 +109,23 @@ class ItemControllerTest {
                 .requestId(null)
                 .build();
 
-        String itemJson = "{\n" +
-                "    \"id\": 1,\n" +
-                "    \"name\": \"item\",\n" +
-                "    \"description\": \"item description\",\n" +
-                "    \"available\": false),\n" +
-                "    \"owner\": {\n" +
-                "        \"id\": 1,\n" +
-                "        \"name\": \"user\",\n" +
-                "        \"email\": \"user@yandex.ru\"\n" +
-                "    },\n" +
-                "    \"lastBooking\": null,\n" +
-                "    \"nextBooking\": null,\n" +
-                "    \"comments\": [],\n" +
-                "    \"requestId\": null\n" +
-                "}";
+        ItemDto itemDto = ItemDto.builder()
+                .id(1L)
+                .name("item")
+                .description("description")
+                .available(false)
+                .owner(UserDto.builder()
+                        .id(1L)
+                        .name("user")
+                        .email("user@yandex.ru")
+                        .build())
+                .lastBooking(null)
+                .nextBooking(null)
+                .comments(List.of())
+                .requestId(null)
+                .build();
+        String itemJson = objectMapper.writeValueAsString(itemDto);
+
         ResponseEntity<Object> response = new ResponseEntity<>(itemJson, HttpStatus.OK);
 
         Mockito.when(itemClient.create(any(), anyLong())).thenReturn(response);
@@ -173,22 +179,23 @@ class ItemControllerTest {
                 .available(true)
                 .requestId(null)
                 .build();
+        ItemDto itemDto = ItemDto.builder()
+                .id(1L)
+                .name("item")
+                .description("description")
+                .available(false)
+                .owner(UserDto.builder()
+                        .id(1L)
+                        .name("user")
+                        .email("user@yandex.ru")
+                        .build())
+                .lastBooking(null)
+                .nextBooking(null)
+                .comments(List.of())
+                .requestId(null)
+                .build();
+        String itemJson = objectMapper.writeValueAsString(itemDto);
 
-        String itemJson = "{\n" +
-                "    \"id\": 1,\n" +
-                "    \"name\": \"item\",\n" +
-                "    \"description\": \"item description\",\n" +
-                "    \"available\": false),\n" +
-                "    \"owner\": {\n" +
-                "        \"id\": 1,\n" +
-                "        \"name\": \"user\",\n" +
-                "        \"email\": \"user@yandex.ru\"\n" +
-                "    },\n" +
-                "    \"lastBooking\": null,\n" +
-                "    \"nextBooking\": null,\n" +
-                "    \"comments\": [],\n" +
-                "    \"requestId\": null\n" +
-                "}";
         ResponseEntity<Object> response = new ResponseEntity<>(itemJson, HttpStatus.OK);
 
         Mockito.when(itemClient.update(any(), anyLong(), anyLong())).thenReturn(response);
@@ -215,11 +222,13 @@ class ItemControllerTest {
                 .authorName("user")
                 .text("not bad")
                 .build();
-        String commentJson = "{\n" +
-                "    \"id\": 1,\n" +
-                "    \"text\": \"not bad\",\n" +
-                "    \"authorName\": \"user\"\n" +
-                "}";
+        CommentDto commentDtoResponse = CommentDto.builder()
+                .id(1L)
+                .text("not bad")
+                .authorName("user")
+                .build();
+        String commentJson = objectMapper.writeValueAsString(commentDtoResponse);
+
         ResponseEntity<Object> response = new ResponseEntity<>(commentJson, HttpStatus.OK);
 
         Mockito.when(itemClient.addComment(any(), anyLong(), anyLong())).thenReturn(response);
@@ -242,7 +251,7 @@ class ItemControllerTest {
     void deleteById_correctUser_thenReturnOk() {
         long userId = 1L;
         long itemId = 1L;
-        mockMvc.perform(MockMvcRequestBuilders.delete("/items/{itemId}", itemId)
+        mockMvc.perform(delete("/items/{itemId}", itemId)
                         .header("X-Sharer-User-Id", userId))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -253,7 +262,7 @@ class ItemControllerTest {
     @SneakyThrows
     @Test
     void deleteAll_thenReturnOk() {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/items"))
+        mockMvc.perform(delete("/items"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
