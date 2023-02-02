@@ -1,14 +1,4 @@
-*.class
-*.log
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-hs_err_pid*
-out/
+HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -41,17 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-*.db
-db/*!/checkstyle.xml
-
-# IntelliJ project files
-out
-gen
-
-checkstyle.xml
-HELP.md
-mvnw
-mvnw.cmd
-README.md
-suppressions.xml
